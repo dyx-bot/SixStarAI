@@ -1,0 +1,79 @@
+/* 背景与基础（手机宽度） */
+.lx-discussion{
+  padding:12px 8px 96px;
+  font-family:"Plus Jakarta Sans","Microsoft YaHei",sans-serif;
+  background:radial-gradient(900px 600px at 50% -10%,#d5f7ea 0%,#c8f1e2 35%,#bdebdc 60%,#b3e6d6 80%,#aee3d2 100%);
+  min-height:100vh;color:#184a38;
+}
+
+/* 外层卡片：手机宽度 */
+.lx-shell{
+  width:min(420px,96vw);margin:0 auto;
+  background:rgba(255,255,255,.72);backdrop-filter:blur(10px);
+  border-radius:18px;box-shadow:0 10px 24px rgba(22,107,78,.12);padding:10px;
+}
+
+/* 顶部“动态”标题 */
+.lx-header{display:flex;justify-content:center;margin:0 0 8px}
+.lx-page-title{margin:0;font-size:22px;line-height:1.2;font-weight:900;color:#166b4e;letter-spacing:.06em}
+
+/* 搜索行 */
+.lx-search-line{display:flex;gap:8px;align-items:center}
+.lx-search-line input{
+  flex:1;padding:10px 12px;border-radius:12px;border:1px solid #e6f5ee;background:#fff;outline:none;font-size:14px;
+}
+.lx-search-line input:focus{border-color:#7ee2b6;box-shadow:0 0 0 3px rgba(126,226,182,.25)}
+.lx-btn{
+  padding:10px 14px;border-radius:14px;border:none;background:linear-gradient(180deg,#7ee2b6,#22a06e);color:#fff;font-weight:700;cursor:pointer;font-size:14px;
+}
+.lx-btn:hover{filter:brightness(1.05)} .lx-btn:active{transform:scale(.98)}
+
+/* 信息流卡片（紧凑） */
+.lx-feed{display:grid;gap:10px;margin-top:10px}
+.lx-feed-card{background:#fff;border-radius:14px;padding:10px 12px;box-shadow:0 1px 0 #edf6f1}
+.lx-feed-hd{display:grid;grid-template-columns:auto 1fr auto;gap:8px 10px;align-items:center}
+.lx-avatar{width:32px;height:32px;border-radius:999px;display:grid;place-items:center;background:#f0fff7;border:1px solid #daf5ea;font-size:16px}
+.lx-author{display:grid;gap:2px}
+.lx-name{font-weight:800;color:#184a38;font-size:14px}
+.lx-meta{font-size:12px;color:#6a8f82}
+.lx-follow{padding:4px 10px;border-radius:999px;border:1px solid #cfeee0;background:#f8fffc;color:#1b6f55;cursor:pointer;font-weight:700;font-size:12px}
+.lx-follow.on{background:linear-gradient(180deg,#7ee2b6,#22a06e);border:none;color:#fff}
+.lx-feed-content{margin:6px 0;color:#2a6a55;line-height:1.55;font-size:14px}
+.lx-feed-actions{display:flex;gap:6px;align-items:center}
+.lx-act{border:none;background:none;color:#3b7f67;padding:4px 8px;border-radius:10px;cursor:pointer;font-size:13px}
+.lx-act span{margin-left:4px} .lx-act.on{background:#f0fff7;color:#166b4e}
+.lx-empty{text-align:center;color:#6a8f82;padding:18px 0;font-size:14px}
+
+/* 悬浮“发布动态”按钮 —— 抬高以避开扁平 TabBar */
+.lx-fab{
+  position:fixed;left:50%;bottom:70px;transform:translateX(-50%);
+  padding:12px 20px;border:none;border-radius:999px;
+  background:linear-gradient(180deg,#7ee2b6,#22a06e);color:#fff;font-weight:800;
+  box-shadow:0 10px 22px rgba(34,160,110,.25);display:inline-flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;
+}
+.lx-fab:hover{filter:brightness(1.05)} .lx-fab:active{transform:translateX(-50%) scale(.98)}
+.lx-fab-icon{width:18px;height:18px}
+
+/* ===== 新增：标签栏（追加，不影响原有任何样式） ===== */
+.lx-tabs{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  margin:10px 0 4px;
+}
+.lx-tab{
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid #cfeee0;
+  background:#f8fffc;
+  color:#1b6f55;
+  cursor:pointer;
+  font-weight:700;
+  font-size:13px;
+}
+.lx-tab.on{
+  background:linear-gradient(180deg,#7ee2b6,#22a06e);
+  color:#fff;
+  border:none;
+  box-shadow:0 6px 14px rgba(34,160,110,.18);
+}

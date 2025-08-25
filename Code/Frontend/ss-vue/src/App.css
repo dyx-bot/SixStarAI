@@ -1,0 +1,60 @@
+:root{
+  --mint-1:#7ee2b6;
+  --mint-2:#22a06e;
+  --ink:#184a38;
+  --bg: radial-gradient(900px 600px at 50% -10%, #d5f7ea 0%, #c8f1e2 35%, #bdebdc 60%, #b3e6d6 80%, #aee3d2 100%);
+}
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Plus Jakarta Sans","Microsoft YaHei",system-ui,sans-serif;
+}
+
+/* 外壳：手机居中画幅 */
+.m-app{min-height:100%;display:grid;grid-template-rows:auto 1fr auto;justify-content:center}
+.m-header,.m-main,.m-tabbar{width:min(420px,100vw)}
+
+/* 顶栏 */
+.m-header{
+  position:sticky;top:0;z-index:5;
+  padding:8px 12px;margin:0 auto;
+  background:rgba(255,255,255,.72);backdrop-filter:blur(10px);
+  border-radius:0 0 16px 16px;box-shadow:0 6px 16px rgba(22,107,78,.10);
+}
+.m-header__brand{display:flex;align-items:center;gap:8px}
+.m-header__brand img{width:24px;height:24px;border-radius:50%}
+.m-header__title{font-weight:900;letter-spacing:.06em;color:#166b4e}
+
+/* 主体（底部预留给更扁的 TabBar） */
+.m-main{margin:8px auto 72px;padding:0 8px 8px}
+
+/* ＝＝ 扁扁的底部 TabBar ＝＝ */
+.m-tabbar{
+  position:fixed;left:50%;bottom:8px;transform:translateX(-50%);
+  background:#fff;border:1px solid #e6f5ee;border-radius:18px;
+  display:flex;justify-content:space-around;align-items:center;gap:4px;
+  padding:6px 6px;      /* 竖向更薄 */
+  height:56px;          /* 固定矮一些 */
+  box-shadow:0 10px 20px rgba(34,160,110,.16);
+  z-index:6;
+}
+.m-tab{
+  flex:1;min-width:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  padding:6px 8px;border-radius:12px;text-decoration:none;
+  color:#2a6a55;font-size:13px;line-height:1;
+}
+.m-tab svg{color:#2a6a55}
+.m-active{
+  background:linear-gradient(180deg,#ffffff,#f0fff7);
+  color:#166b4e;border:1px solid #bdebdc;
+}
+.m-active svg{color:#166b4e}
+
+/* 通用浅绿按钮 */
+.m-btn{
+  background:linear-gradient(180deg,var(--mint-1),var(--mint-2));
+  color:#fff;border:none;border-radius:12px;padding:10px 12px;font-weight:700;cursor:pointer;
+}
+.m-btn:active{transform:scale(.98)}
