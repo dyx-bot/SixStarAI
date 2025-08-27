@@ -11,6 +11,9 @@ import Chat from "./pages/Chat.jsx";
 import Discussion from "./pages/Discussion.jsx";
 import Profile from "./pages/Profile.jsx";
 import 'element-plus/dist/index.css';
+import Setting from "./pages/Setting.jsx";
+import Post from "./pages/Post.jsx";
+import PostDetail from "./pages/PostDerails.jsx";
 
 const router = createBrowserRouter([
   { path: "/", 
@@ -26,6 +29,9 @@ const router = createBrowserRouter([
       { path: "mine", element: <Profile /> },       // 你的“我的”页
     ],
   },
+  { path: "/setting", element: <Setting /> },
+  { path: "/post", element: <Post /> },
+  { path: "/post/:id", element: <PostDetail /> },
   { path: "*", element: <Login /> },
 ]);
 
