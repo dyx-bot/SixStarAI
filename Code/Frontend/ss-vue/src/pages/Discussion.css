@@ -104,9 +104,10 @@
 
 .lx-feed-hd {
   display: flex;
+  justify-content: flex-start;
   align-items: center;
-  justify-content: space-between;
   margin-bottom: 12px;
+  gap:10px
 }
 
 .lx-avatar {
@@ -128,10 +129,8 @@
 }
 
 .lx-author {
-  padding-left: 2px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  display: grid;
+  gap: 2px;
 }
 
 .lx-name {
@@ -143,13 +142,11 @@
 .lx-meta {
   font-size: 12px;
   color: #6a8f82;
-  background-color: #f8fffc;
-  padding: 2px 6px;
 }
 
 .lx-follow {
   padding: 4px 12px;
-  background-color: transparent;
+  background-color: #e6f7f0;
   border: 1px solid #a9d1c0;
   border-radius: 20px;
   font-size: 12px;
@@ -157,22 +154,17 @@
   transition: all 0.2s;
 }
 
-.lx-follow.on {
-  background-color: #6bbf9c;
-  color: white;
-  border-color: #6bbf9c;
+.lx-follow.on {  
+  padding: 4px 12px;
+  background-color:linear-gradient(
+    180deg,
+    #7ee2b6,
+    #22a06e /* 下：稍深一点 */
+  ) ;
+  color: #fff;
+  border: none;
 }
 
-.lx-follow:hover {
-  background-color: #f0f4f1;
-}
-
-.lx-feed-content {
-  font-size: 14px;
-  line-height: 1.5;
-  color: #333;
-  margin-bottom: 12px;
-}
 
 .lx-feed-actions {
   display: flex;

@@ -18,7 +18,7 @@ export default function Discussion() {
       {
         id: 1,
         avatar: "🧑",
-        name: "晚风 k515",
+        username: "晚风 k515",
         meta: "男 · 27 · 开封市",
         content:
           "希望对方能活泼开朗一点，平时可以像朋友一样，能一起聊天，不会打扰你的生活，节假日可以一起出游。",
@@ -31,7 +31,7 @@ export default function Discussion() {
       {
         id: 2,
         avatar: "🧑‍🚀",
-        name: "七洋",
+        username: "七洋",
         meta: "男 · 27 · 沈阳市",
         content:
           "必须要小孩，共同抚养。希望一年内结婚，给双方家庭一个完整的答案。性格成熟，情绪稳定，心里别太多事。",
@@ -44,7 +44,7 @@ export default function Discussion() {
       {
         id: 3,
         avatar: "🐶",
-        name: "nananow",
+        username: "nananow",
         meta: "男 · 30 · 株洲市",
         content:
           "长相阳光开朗，不娘不丑，过得去。性格随和，无不良嗜好，三观正直。喜欢小孩，希望可以一起养只猫或狗。",
@@ -57,7 +57,7 @@ export default function Discussion() {
       {
         id: 4,
         avatar: "👩",
-        name: "小林",
+        username: "小林",
         meta: "女 · 24 · 海淀区",
         content:
           "今天学校图书馆新开了自习区，环境很安静～欢迎一起学习，互相监督打卡！",
@@ -77,7 +77,7 @@ export default function Discussion() {
     (p) =>
       (active === "follow" ? p.follow : p.tag === active || active === "feed") &&
       (!kw ||
-        p.name.includes(kw) ||
+        p.username.includes(kw) ||
         p.meta.includes(kw) ||
         p.content.includes(kw))
   );
@@ -103,7 +103,7 @@ export default function Discussion() {
     const newPost = {
       id: Date.now(),
       avatar: "🌿",
-      name: "我",
+      username: "我",
       meta: "同学 · 校园",
       content: title,
       tag: active === "wall" || active === "story" ? active : "feed",

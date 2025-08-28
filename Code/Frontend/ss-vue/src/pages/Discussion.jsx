@@ -1,111 +1,219 @@
-import React, { useMemo, useState } from "react";
+// src/pages/Discussion.jsx
+import React, { useMemo, useState, useEffect } from "react";
 import "./Discussion.css";
+import { getAuth } from "../auth/storage";
+import { BASE } from "../lib/api";
+import { useNavigate } from "react-router-dom"; // 添加路由导航
 
-/**
- * 热度评分说明：
- * score = (like * 1 + comment * 2) * freshness
- * 其中 freshness = exp( - ageDays / 7 )
- * - 评论权重更高（2）
- * - 7 天为半衰期：越新的内容 freshness 越接近 1，越旧分值越小
- */
 function hotScore(p) {
   const now = Date.now();
   const ageDays = Math.max(0, (now - (p.createdAt || now)) / (1000 * 60 * 60 * 24));
   const freshness = Math.exp(-ageDays / 7);
-  return (p.like * 1 + p.comment * 2) * freshness;
+  return (p.likeCount * 1 + p.replyCount * 2) * freshness;
 }
 
 export default function Discussion() {
   const [kw, setKw] = useState("");
   const [tab, setTab] = useState("all"); // all | hot
-
-  // 带时间戳的示例数据（用于热门排序的时间衰减）
+  const [showDialog, setShowDialog] = useState(false);
+  const navigate = useNavigate(); // 使用路由导航
+  
+  // 带时间戳的示例数据
   const demo = useMemo(
     () => [
       {
         id: 1,
         avatar: "📚",
-        name: "小周",
-        meta: "信息学院 · 大二",
+        username: "小周",
         content: "下学期选《数据结构》推荐哪位老师？实验量如何？",
-        liked: false,
-        like: 34,
-        comment: 6,
-        follow: true,
-        createdAt: Date.now() - 1000 * 60 * 60 * 24 * 2, // 2 天前
+        isliked: false,
+        likeCount: 34,
+        replyCount: 6,
+        college: "经管",
+        grade: "大二",
+        isFavorited: true,
+        createdAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
       },
       {
         id: 2,
         avatar: "🖥️",
-        name: "LYY",
-        meta: "信科 · 大三",
+        username: "LYY",
+        college: "计算机",
+        grade: "大三",
         content: "图书馆研讨间怎么预约更容易抢到位？",
-        liked: true,
-        like: 58,
-        comment: 10,
-        follow: false,
-        createdAt: Date.now() - 1000 * 60 * 60 * 24 * 5, // 5 天前
+        isliked: true,
+        likeCount: 58,
+        replyCount: 10,
+        isFavorited: false,
+        createdAt: Date.now() - 1000 * 60 * 60 * 24 * 5,
       },
       {
         id: 3,
         avatar: "🍜",
-        name: "饭团",
-        meta: "经管 · 大二",
+        username: "饭团", 
+        college: "食品",
+        grade: "大一",
         content: "食堂哪家性价比最高？求安利隐藏菜单～",
-        liked: false,
-        like: 18,
-        comment: 5,
-        follow: false,
-        createdAt: Date.now() - 1000 * 60 * 60 * 24 * 1, // 1 天前
+        isliked: false,
+        likeCount: 18,
+        replyCount: 5,
+        isFavorited: false,
+        createdAt: Date.now() - 1000 * 60 * 60 * 24 * 1,
       },
     ],
     []
   );
 
+  useEffect(() => {
+    const userId = getAuth().id;
+    fetch(`${BASE}/api/posts/get?userId=${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        let arr = Array.isArray(data.data) ? data.data : Array.isArray(data) ? data : [];
+        // 保证数值字段为数字，布尔字段为布尔值
+        arr = arr.map(p => ({
+          ...p,
+          likeCount: Number(p.likeCount || 0),
+          replyCount: Number(p.replyCount || 0),
+          isliked: !!p.isliked,
+          isFavorited: !!p.isFavorited, 
+        }));
+        setPosts(arr);
+      })
+      .catch(() => {});
+  }, []);
+
   const [posts, setPosts] = useState(demo);
 
-  // 全部：仍按你的关键词过滤
-  const filtered = posts.filter(
-    (p) => !kw || p.name.includes(kw) || p.meta.includes(kw) || p.content.includes(kw)
-  );
+  // 全部：按时间倒序排列（最新的在前）
+  const filtered = posts
+    .slice()
+    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+    .filter(
+      (p) => !kw || p.username.includes(kw) || p.college.includes(kw) || p.grade.includes(kw) || p.content.includes(kw)
+    );
 
-  // 热门：先按热度分数排序，再做同样的关键词过滤
   const hotSorted = [...posts]
     .sort((a, b) => hotScore(b) - hotScore(a))
-    .filter((p) => !kw || p.name.includes(kw) || p.meta.includes(kw) || p.content.includes(kw));
+    .filter((p) => !kw || p.username.includes(kw) || p.college.includes(kw) || p.grade.includes(kw) || p.content.includes(kw));
 
-  const toggleLike = (id) =>
+  const viewList = tab === "all" ? filtered : hotSorted;
+
+  const toggleLike = async (id, isliked) => {
+    const userId = getAuth().id;
+    
+    // 先本地乐观更新
     setPosts((a) =>
       a.map((p) =>
-        p.id === id ? { ...p, liked: !p.liked, like: p.liked ? p.like - 1 : p.like + 1 } : p
+        p.id === id
+          ? {
+              ...p,
+              isliked: !p.isliked,
+              likeCount: Number(p.likeCount || 0) + (!p.isliked ? 1 : -1),
+            }
+          : p
       )
     );
 
-  const toggleFollow = (id) =>
-    setPosts((a) => a.map((p) => (p.id === id ? { ...p, follow: !p.follow } : p)));
+    // 调用后端接口
+    try {
+      const response = await fetch(`${BASE}/api/likes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          postId: id,
+          userId: userId,
+          isliked: !isliked, // true=点赞，false=取消
+        }),
+      });
 
-  const publish = () => {
-    const text = window.prompt("写点什么吧（示例：今晚自习室很高效！）");
-    if (!text) return;
-    setPosts((a) => [
-      {
-        id: Date.now(),
-        avatar: "🌿",
-        name: "我",
-        meta: "同学 · 校园",
-        content: text,
-        liked: false,
-        like: 0,
-        comment: 0,
-        follow: true,
-        createdAt: Date.now(), // 新发布的时间
-      },
-      ...a,
-    ]);
+      const result = await response.json();
+
+      // 根据后端返回的数据更新状态
+      if (result.likeCount !== undefined && result.likeCount !== null) {
+        setPosts((a) =>
+          a.map((p) =>
+            p.id === id
+              ? {
+                  ...p,
+                  isliked: result.isLiked,
+                  likeCount: result.likeCount,
+                }
+              : p
+          )
+        );
+      }
+    } catch (err) {
+      // 失败时可回滚本地状态
+      setPosts((a) =>
+        a.map((p) =>
+          p.id === id
+            ? {
+                ...p,
+                isliked: isliked,
+                likeCount: Number(p.likeCount || 0) + (isliked ? 1 : -1),
+              }
+            : p
+        )
+      );
+      alert("点赞失败，请重试");
+    }
   };
 
-  // 视图数据：全部=filtered；热门=hotSorted
-  const viewList = tab === "all" ? filtered : hotSorted;
+  const toggleFollow = async (id, isFavorited) => {
+    const userId = getAuth().id;
+    
+    // 先本地乐观更新
+    setPosts((a) =>
+      a.map((p) =>
+        p.id === id
+          ? { ...p, isFavorited: !p.isFavorited }
+          : p
+      )
+    );
+
+    // 调用后端接口
+    try {
+      const response = await fetch(`${BASE}/api/favorites`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          postId: id,
+          userId: userId,
+          favorited: !isFavorited, // true=收藏，false=取消
+        }),
+      });
+      
+      const result = await response.json();
+      
+      // 根据后端返回的数据更新状态
+      if (typeof result.isFavorited === "boolean") {
+        setPosts((a) =>
+          a.map((p) =>
+            p.id === id
+              ? { ...p, isFavorited: result.isFavorited }
+              : p
+          )
+        );
+      }
+    } catch (err) {
+      // 失败时回滚
+      setPosts((a) =>
+        a.map((p) =>
+          p.id === id
+            ? { ...p, isFavorited: isFavorited }
+            : p
+        )
+      );
+      alert("收藏失败，请重试");
+    }
+  };
+
+  // 点击帖子跳转到详情页
+  const handlePostClick = (post) => {
+    // 使用路由跳转到详情页
+    navigate(`/post/${post.id}`);
+  };
 
   return (
     <div className="lx-discussion">
@@ -123,7 +231,6 @@ export default function Discussion() {
           <button className="lx-btn">搜索</button>
         </div>
 
-        {/* 标签栏（不改你现有样式，其类名为新增 .lx-tabs/.lx-tab） */}
         <div className="lx-tabs">
           <button
             className={`lx-tab ${tab === "all" ? "on" : ""}`}
@@ -144,32 +251,53 @@ export default function Discussion() {
             <div className="lx-empty">暂无内容，稍后再来~</div>
           ) : (
             viewList.map((p) => (
-              <article className="lx-feed-card" key={p.id}>
+              <article 
+                className="lx-feed-card" 
+                key={p.id}
+                onClick={() => handlePostClick(p)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="lx-feed-hd">
                   <div className="lx-avatar" aria-hidden>
-                    {p.avatar}
+                    {
+                      /^https?:\/\//.test(p.avatar)
+                        ? <img src={p.avatar} alt="头像" style={{width: "100%", height: "100%", borderRadius: "50%"}} />
+                        : p.avatar
+                    }
                   </div>
                   <div className="lx-author">
-                    <div className="lx-name">{p.name}</div>
-                    <div className="lx-meta">{p.meta}</div>
+                    <div className="lx-name">{p.username}</div>
+                    <div style={{display: 'flex'}}>
+                      <span className="lx-meta">{p.college}</span>
+                      <span className="lx-meta">{p.grade}</span>
+                    </div>   
                   </div>
                   <button
-                    className={`lx-follow ${p.follow ? "on" : ""}`}
-                    onClick={() => toggleFollow(p.id)}
+                    className={`lx-follow ${p.isFavorited ? "on" : ""}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFollow(p.id, p.isFavorited);
+                    }}
                   >
-                    {p.follow ? "已关注" : "关注"}
+                    {p.isFavorited ? "已收藏" : "收藏"}
                   </button>
+                </div>
+                <div className="lx-reply-time">
+                   {new Date(p.createdAt).toLocaleString('zh-CN')}
                 </div>
                 <div className="lx-feed-content">{p.content}</div>
                 <div className="lx-feed-actions">
                   <button
-                    className={`lx-act ${p.liked ? "on" : ""}`}
-                    onClick={() => toggleLike(p.id)}
+                    className={`lx-act ${p.isliked ? "on" : ""}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleLike(p.id, p.isliked);
+                    }}
                   >
-                    👍 <span>{p.like}</span>
+                    👍 <span>{p.likeCount}</span>
                   </button>
                   <button className="lx-act">
-                    💬 <span>{p.comment}</span>
+                    💬 <span>{p.replyCount}</span>
                   </button>
                   <button className="lx-act">⋯</button>
                 </div>
@@ -179,10 +307,10 @@ export default function Discussion() {
         </div>
       </div>
 
-      {/* 悬浮发布按钮（不挡住底部Tab，位置略上移） */}
+      {/* 悬浮发布按钮 */}
       <button
         className="lx-fab"
-        onClick={publish}
+        onClick={() => navigate("/post")}
         aria-label="发布动态"
         style={{ bottom: "84px" }}
       >

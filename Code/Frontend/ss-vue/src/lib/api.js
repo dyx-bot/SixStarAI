@@ -1,5 +1,5 @@
 // 后端接口基础地址（必须写后端真实地址，如 http://localhost:3000，不能是相对路径）
-const BASE = import.meta.env.VITE_API_BASE || 'http://10.10.24.173:8080'; // 优先从环境变量取，否则用默认后端地址
+export const BASE =  'http://10.10.24.169:8080'; 
 
 // 通用请求函数（封装fetch，添加必要的请求头和错误处理）
 const request = async (url, options = {}) => {
@@ -48,4 +48,29 @@ export const loginApi = async (username, password) => {
       password: password 
     },
   });
+};
+// 上传头像接口
+export const uploadAvatarApi = async (userId, file) => {
+  const formData = new FormData();
+  formData.append('avatar', file);
+
+  const fullUrl = `${BASE}/api/update/avatar/${userId}`;
+
+  try {
+    const response = await fetch(fullUrl, {
+      method: 'PUT',
+      body: formData,
+      // 注意：上传文件时不要设置 Content-Type，让浏览器自动设置 multipart/form-data
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`头像上传失败：${response.status}-${errorText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    throw new Error(`请求失败：${err.message}`);
+  }
 };

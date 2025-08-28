@@ -12,9 +12,11 @@ export default function Setting() {
 
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [usernameText, setUsernameText] = useState(username || "");
-  const [avatarUrl, setAvatarUrl] = useState(avatar || "/bjfu-logo.png");
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
+  const [avatarUrl, setAvatarUrl] = useState(avatar || "/bjfu-logo.png"); 
+
+
 
   // 监听登录状态变化
   useEffect(() => {
@@ -25,12 +27,9 @@ export default function Setting() {
     if (avatar) {
       setAvatarUrl(avatar);
     }
-    console.log("auth:", getAuth());
   }, []);
 
   
-
-
   // 监听回车或失焦保存
   const handleUsernameInputKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -53,27 +52,34 @@ const handleFileChange = async (e) => {
   if (!file) return;
   setUploading(true);
 
-  // 1. 读取为 base64
   const reader = new FileReader();
   reader.onload = async function(evt) {
-    const base64 = evt.target.result; // 形如 data:image/png;base64,xxxx
+    const base64 = evt.target.result;
+
     try {
       const res = await fetch(`${BASE}/api/update/avatar/${id}`, {
-        method: "PUT",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ avatar: base64 })
       });
+
+      if (!res.ok) {
+        throw new Error(`上传失败: ${res.status} - ${await res.text()}`);
+      }
+
       const data = await res.json();
+      console.log("服务端返回的数据:", data);
+
       if (data.success) {
         let avatarPath = data.avatar;
-if (avatarPath && !avatarPath.startsWith("http") && !avatarPath.startsWith("data:")) {
-        // 只返回了文件名，自动拼接
-        avatarPath = "/uploads/avatar/" + avatarPath;
-      }
-        setAvatarUrl(data.avatar || base64); // 优先用后端返回，否则用本地base64
-        // 可选：同步到localStorage
-        localStorage.setItem("auth_user_avatar", data.avatar || base64);
 
+        // 如果 avatarPath 是相对路径，拼接为完整路径
+        const fullAvatarUrl = avatarPath.startsWith("http")
+          ? avatarPath
+          : `${BASE}${avatarPath.startsWith("/") ? "" : "/"}${avatarPath}`;
+
+        setAvatarUrl(fullAvatarUrl || base64);
+        localStorage.setItem("auth_user_avatar", fullAvatarUrl || base64);
       } else {
         alert("上传失败：" + (data.message || "未知错误"));
       }
@@ -85,6 +91,7 @@ if (avatarPath && !avatarPath.startsWith("http") && !avatarPath.startsWith("data
   };
   reader.readAsDataURL(file);
 };
+
 
 const handleUsernameSave = async() => {
   setIsEditingUsername(false);

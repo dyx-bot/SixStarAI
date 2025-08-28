@@ -81,6 +81,7 @@ export default function PostDetail() {
         // 将新回复添加到列表顶部
         setReplies(prev => [newReply, ...prev]);
         setReplyContent("");
+        window.location.reload(); // 刷新页面以显示最新回复
       }
     } catch (err) {
       console.error("回复失败:", err);
@@ -127,7 +128,7 @@ export default function PostDetail() {
               }
             </div>
             <div className="lx-author-info">
-              <div className="lx-name">{post.name}</div>
+              <div className="lx-name">{post.username}</div>
               <div className="lx-meta-group">
                 <span className="lx-meta">{post.college}</span>
                 <span className="lx-meta">{post.grade}</span>
@@ -153,17 +154,14 @@ export default function PostDetail() {
                       {reply.avatar || "👤"}
                     </div>
                     <div className="lx-reply-info">
-                      <div className="lx-reply-author">{reply.name || "匿名用户"}</div>
+                      <div className="lx-reply-author">{reply.username || "匿名用户"}</div>
                       <div className="lx-reply-time">
                         {new Date(reply.createdAt).toLocaleString('zh-CN')}
                       </div>
                     </div>
                   </div>
                   <div className="lx-reply-content">{reply.content}</div>
-                  <div className="lx-reply-actions">
-                    <button className="lx-reply-act">👍 {reply.like || 0}</button>
-                    <button className="lx-reply-act">⭐ {reply.favorite || 0}</button>
-                  </div>
+                  
                 </div>
               ))
             )}

@@ -41,8 +41,12 @@ export default function Login() {
       // 3. 后端响应处理（完全保留你的原有逻辑：成功存登录态、跳转首页；失败提示原因）
       if (data?.success) { 
         saveAuth({ 
-          token: data.token, 
-          userInfo: data.userInfo 
+          id: data.id||data.userId, 
+          username: data.username,
+          avatar: data.avatar,
+          college: data.college,
+          grade: data.grade, 
+          token: data.token
         });
         ElMessage.success('登录成功！');
         console.log("Navigating to /");

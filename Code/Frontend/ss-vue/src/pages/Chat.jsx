@@ -1,33 +1,63 @@
 import React, { useState, useRef } from "react";
+import { BASE } from "../lib/api";
 
 export default function Chat() {
   const [list, setList] = useState([
     {
       role: "assistant",
       avatar: "/bjfu-logo.png",
-      text: "你好，我是六星问知 AI 助手～有什么想问的吗？",
+      textResponse: "你好，我是六星问知 AI 助手～有什么想问的吗？",
     },
   ]);
   const [msg, setMsg] = useState("");
   const [typing, setTyping] = useState(false);
   const fileRef = useRef(null);
 
-  const send = () => {
-    const text = msg.trim();
-    if (!text) return;
+const send = async () => {
+  const textResponse = msg.trim();
+  if (!textResponse) return;
 
-    setList((arr) => [...arr, { role: "user", text }]);
-    setMsg("");
-    setTyping(true);
+  setList((arr) => [...arr, { role: "user", textResponse }]);
+  setMsg("");
+  setTyping(true);
 
-    setTimeout(() => {
+  try {
+    const res = await fetch(`${BASE}/api/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: textResponse,
+        mode:"chat",
+        sessionId:"user123-sessions456",
+        reset: false
+      }),
+    });
+
+    // 检查状态码是否为 400
+    if (!res.ok) {
+      const errorData = await res.json();
       setTyping(false);
       setList((arr) => [
         ...arr,
-        { role: "assistant", avatar: "/bjfu-logo.png", text: "（演示）已收到：" + text },
+        { role: "assistant", avatar: "/bjfu-logo.png", textResponse: errorData.message || "请求失败" },
       ]);
-    }, 1200);
-  };
+      return;
+    }
+
+    const data = await res.json();
+    setTyping(false);
+    setList((arr) => [
+      ...arr,
+      { role: "assistant", avatar: "/bjfu-logo.png", textResponse: data.textResponse || "（无回复）" },
+    ]);
+  } catch (err) {
+    setTyping(false);
+    setList((arr) => [
+      ...arr,
+      { role: "assistant", avatar: "/bjfu-logo.png", textResponse: "网络错误：" + err.message },
+    ]);
+  }
+};
 
   const openImagePicker = () => fileRef.current?.click();
 
@@ -45,7 +75,7 @@ export default function Chat() {
                   </div>
                 )}
                 <div className={`bubble ${m.role}`}>
-                  {String(m.text)}
+                  {String(m.textResponse)}
                   <span className="tail" />
                 </div>
               </div>
@@ -83,11 +113,11 @@ export default function Chat() {
             />
           </div>
 
-          <button className="icon-btn" onClick={() => alert("更多功能")} aria-label="更多">
+          {/* <button className="icon-btn" onClick={() => alert("更多功能")} aria-label="更多">
             <svg viewBox="0 0 24 24" width="22" height="22">
               <path d="M12 4v16M4 12h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
-          </button>
+          </button> */}
 
           <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} />
         </div>

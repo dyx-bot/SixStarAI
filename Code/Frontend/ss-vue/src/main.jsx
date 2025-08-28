@@ -14,6 +14,9 @@ import 'element-plus/dist/index.css';
 import Setting from "./pages/Setting.jsx";
 import Post from "./pages/Post.jsx";
 import PostDetail from "./pages/PostDerails.jsx";
+import MyPosts from "./pages/MyPosts.jsx";
+import MyLike from "./pages/MyLike.jsx";
+import MyFavorite from "./pages/MyFavorite.jsx";
 
 const router = createBrowserRouter([
   { path: "/", 
@@ -32,6 +35,9 @@ const router = createBrowserRouter([
   { path: "/setting", element: <Setting /> },
   { path: "/post", element: <Post /> },
   { path: "/post/:id", element: <PostDetail /> },
+  { path: "/my/posts", element: <MyPosts /> },
+  { path: "/my/likes", element: <MyLike /> },
+  { path: "/my/favorites", element: <MyFavorite /> },
   { path: "*", element: <Login /> },
 ]);
 
