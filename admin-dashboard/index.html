@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>六星问知 - 管理员后台</title>
+  
+  <!-- 引入第三方CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  
+  <!-- 引入自定义CSS -->
+  <link rel="stylesheet" href="./assets/css/styles.css">
+  
+  <!-- 配置Tailwind主题：主页面浅绿 + 导航栏深绿 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#A7F3D0', // 浅绿主色
+            secondary: '#10B981', // 深绿辅助色
+            success: '#10B981', 
+            warning: '#FAAD14', 
+            danger: '#FF4D4F',
+            orange: '#FF7A45', // 拉黑按钮颜色
+            dark: '#1D2129',
+            'gray-light': '#F2F3F5',
+            'gray-medium': '#C9CDD4',
+            'gray-dark': '#86909C',
+            'sidebar-bg': '#059669', // 导航栏深绿
+            'main-bg': '#F0FDF4' // 主页面浅绿
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+</head>
+<body class="font-inter bg-main-bg text-dark min-h-screen flex overflow-hidden">
+  <!-- 左侧导航栏：字号从text-2xl微调至text-xl，保持清晰且不拥挤 -->
+  <aside id="sidebar" class="w-60 bg-sidebar-bg border-r border-gray-200 h-screen flex-shrink-0 transition-all duration-300 ease-in-out z-30">
+    <div class="p-4 border-b border-gray-600/30 flex items-center gap-3">
+      <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+        <i class="fa fa-cogs text-white text-xl"></i>
+      </div>
+      <h1 class="text-xl font-bold text-white">六星问知</h1>
+      <button id="close-sidebar" class="ml-auto lg:hidden text-gray-200 hover:text-white text-xl">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+    <nav class="p-3 flex-grow overflow-y-auto">
+      <p class="text-sm uppercase text-gray-300/70 font-medium mb-3 px-3">主要功能</p>
+      <ul class="space-y-2">
+        <li><a href="#dashboard" class="sidebar-item active flex items-center gap-4 py-4 px-3 bg-primary/20 text-primary rounded-md" data-target="dashboard">
+          <i class="fa fa-dashboard w-7 text-center text-xl"></i>
+          <span class="text-xl font-medium">数据概览</span>
+        </a></li>
+        <li><a href="#user-management" class="sidebar-item flex items-center gap-4 py-4 px-3 text-white hover:bg-primary/20 hover:text-primary rounded-md transition-colors" data-target="user-management">
+          <i class="fa fa-users w-7 text-center text-xl"></i>
+          <span class="text-xl font-medium">用户管理</span>
+        </a></li>
+        <li><a href="#content-management" class="sidebar-item flex items-center gap-4 py-4 px-3 text-white hover:bg-primary/20 hover:text-primary rounded-md transition-colors" data-target="content-management">
+          <i class="fa fa-file-text w-7 text-center text-xl"></i>
+          <span class="text-xl font-medium">内容管理</span>
+        </a></li>
+      </ul>
+      <p class="text-sm uppercase text-gray-300/70 font-medium mb-3 mt-8 px-3">系统设置</p>
+      <ul class="space-y-2">
+        <li><a href="#system-settings" class="sidebar-item flex items-center gap-4 py-4 px-3 text-white hover:bg-primary/20 hover:text-primary rounded-md transition-colors" data-target="system-settings">
+          <i class="fa fa-cog w-7 text-center text-xl"></i>
+          <span class="text-xl font-medium">系统设置</span>
+        </a></li>
+      </ul>
+    </nav>
+    <div class="p-4 border-t border-gray-600/30">
+      <div class="flex items-center gap-3">
+        <img src="https://picsum.photos/id/1005/200/200" alt="管理员头像" class="w-10 h-10 rounded-full object-cover border-2 border-white/50">
+        <div>
+          <p class="font-medium text-xl text-white">管理员</p>
+          <p class="text-base text-gray-300">admin@example.com</p>
+        </div>
+        <button class="ml-auto text-gray-300 hover:text-primary transition-colors text-xl">
+          <i class="fa fa-sign-out"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col overflow-hidden">
+    <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 z-20">
+      <div class="flex items-center gap-4">
+        <button id="toggle-sidebar" class="lg:hidden text-gray-dark hover:text-primary"><i class="fa fa-bars text-xl"></i></button>
+        <div class="relative">
+          <input type="text" placeholder="搜索..." class="pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary w-64">
+          <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-dark"></i>
+        </div>
+      </div>
+      <div class="flex items-center gap-5">
+        <button class="relative text-gray-dark hover:text-primary transition-colors"><i class="fa fa-bell text-xl"></i><span class="absolute -top-1 -right-1 w-4 h-4 bg-danger rounded-full text-white text-xs flex items-center justify-center">3</span></button>
+        <button class="relative text-gray-dark hover:text-primary transition-colors"><i class="fa fa-envelope text-xl"></i><span class="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full text-white text-xs flex items-center justify-center">5</span></button>
+        <div class="border-l border-gray-200 h-8"></div>
+        <div class="flex items-center gap-3">
+          <img src="https://picsum.photos/id/1005/200/200" alt="管理员头像" class="w-9 h-9 rounded-full object-cover border-2 border-white shadow-sm">
+        </div>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-6 bg-main-bg" id="page-content">
+      <!-- 数据概览页面：新增内容分类柱形图，与两张用户分布图并列 -->
+      <div class="page active" id="dashboard-page">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+          <div><h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold">数据概览</h2><p class="text-gray-dark">欢迎回来，这里是系统运行的关键数据</p></div>
+          <div class="flex gap-3">
+            <div class="relative">
+              <select class="pl-4 pr-10 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary appearance-none bg-white">
+                <option>最近7天</option><option>最近30天</option><option>最近90天</option><option>今年</option>
+              </select>
+              <i class="fa fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-dark pointer-events-none"></i>
+            </div>
+            <button class="btn btn-primary"><i class="fa fa-download"></i><span>导出报告</span></button>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100">
+            <div class="flex items-start justify-between">
+              <div><p class="text-gray-dark text-sm mb-1">总用户数</p><h3 class="text-3xl font-bold mb-2">12,847</h3><p class="text-success text-sm flex items-center"><i class="fa fa-arrow-up mr-1"></i> 12.5% <span class="text-gray-dark ml-1">较上月</span></p></div>
+              <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary"><i class="fa fa-users text-xl"></i></div>
+            </div>
+          </div>
+          <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100">
+            <div class="flex items-start justify-between">
+              <div><p class="text-gray-dark text-sm mb-1">内容总数</p><h3 class="text-3xl font-bold mb-2">42,195</h3><p class="text-success text-sm flex items-center"><i class="fa fa-arrow-up mr-1"></i> 15.7% <span class="text-gray-dark ml-1">较上月</span></p></div>
+              <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary"><i class="fa fa-file-text text-xl"></i></div>
+            </div>
+          </div>
+          <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100">
+            <div class="flex items-start justify-between">
+              <div><p class="text-gray-dark text-sm mb-1">本周新增用户</p><h3 class="text-3xl font-bold mb-2">356</h3><p class="text-success text-sm flex items-center"><i class="fa fa-arrow-up mr-1"></i> 8.2% <span class="text-gray-dark ml-1">较上周</span></p></div>
+              <div class="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center text-success"><i class="fa fa-user-plus text-xl"></i></div>
+            </div>
+          </div>
+          <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100">
+            <div class="flex items-start justify-between">
+              <div><p class="text-gray-dark text-sm mb-1">未回复提问</p><h3 class="text-3xl font-bold mb-2">24</h3><p class="text-danger text-sm flex items-center"><i class="fa fa-arrow-up mr-1"></i> 2.1% <span class="text-gray-dark ml-1">较昨日</span></p></div>
+              <div class="w-12 h-12 rounded-lg bg-danger/10 flex items-center justify-center text-danger"><i class="fa fa-question-circle text-xl"></i></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 图表区域：调整为3列布局，新增内容分类柱形图 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <!-- 1. 用户年级分布（原用户分布修改） -->
+          <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100">
+            <div class="flex items-center justify-between mb-6"><h3 class="font-bold text-lg">用户年级分布</h3><button class="text-gray-dark hover:text-primary"><i class="fa fa-ellipsis-v"></i></button></div>
+            <div class="h-80"><canvas id="user-grade-chart"></canvas></div>
+          </div>
+          <!-- 2. 用户学院分布 -->
+          <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100">
+            <div class="flex items-center justify-between mb-6"><h3 class="font-bold text-lg">用户学院分布</h3><button class="text-gray-dark hover:text-primary"><i class="fa fa-ellipsis-v"></i></button></div>
+            <div class="h-80"><canvas id="user-college-chart"></canvas></div>
+          </div>
+          <!-- 3. 新增：内容分类柱形图 -->
+          <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100">
+            <div class="flex items-center justify-between mb-6"><h3 class="font-bold text-lg">内容分类分布</h3><button class="text-gray-dark hover:text-primary"><i class="fa fa-ellipsis-v"></i></button></div>
+            <div class="h-80"><canvas id="content-category-chart"></canvas></div>
+          </div>
+        </div>
+        <!-- 软件使用趋势：保持在下方全屏布局 -->
+        <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100 mb-6">
+          <div class="flex items-center justify-between mb-6"><h3 class="font-bold text-lg">软件使用趋势</h3><div class="flex gap-2"><button class="btn btn-outline text-xs py-1">日</button><button class="btn btn-primary text-xs py-1">周</button><button class="btn btn-outline text-xs py-1">月</button></div></div>
+          <div class="h-80"><canvas id="usage-trend-chart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- 用户管理页面：保持拉黑按钮功能不变 -->
+      <div class="page hidden" id="user-management-page">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+          <div><h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold">用户管理</h2><p class="text-gray-dark">管理系统所有用户账户和权限</p></div>
+          <div class="flex gap-3">
+            <div class="relative"><input type="text" placeholder="搜索用户..." class="pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary w-full md:w-64"><i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-dark"></i></div>
+            <button class="btn btn-primary"><i class="fa fa-plus"></i><span>添加用户</span></button>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100"><div class="flex items-start justify-between"><div><p class="text-gray-dark text-sm mb-1">总用户</p><h3 class="text-3xl font-bold mb-2">12,847</h3><p class="text-success text-sm flex items-center"><i class="fa fa-arrow-up mr-1"></i> 12.5% <span class="text-gray-dark ml-1">较上月</span></p></div><div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary"><i class="fa fa-users text-xl"></i></div></div></div>
+          <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100"><div class="flex items-start justify-between"><div><p class="text-gray-dark text-sm mb-1">活跃用户</p><h3 class="text-3xl font-bold mb-2">6,521</h3><p class="text-success text-sm flex items-center"><i class="fa fa-arrow-up mr-1"></i> 8.3% <span class="text-gray-dark ml-1">较上月</span></p></div><div class="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center text-success"><i class="fa fa-user-circle text-xl"></i></div></div></div>
+        </div>
+        
+        <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100 mb-6">
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div class="flex flex-wrap gap-2">
+              <button class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">全部用户</button>
+              <button class="px-3 py-1 bg-gray-light text-gray-dark rounded-full text-sm hover:bg-gray-200">大一学生</button>
+              <button class="px-3 py-1 bg-gray-light text-gray-dark rounded-full text-sm hover:bg-gray-200">大二学生</button>
+              <button class="px-3 py-1 bg-gray-light text-gray-dark rounded-full text-sm hover:bg-gray-200">大三学生</button>
+              <button class="px-3 py-1 bg-gray-light text-gray-dark rounded-full text-sm hover:bg-gray-200">大四学生</button>
+              <button class="px-3 py-1 bg-gray-light text-gray-dark rounded-full text-sm hover:bg-gray-200">教师</button>
+            </div>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead><tr class="border-b border-gray-200">
+                <th class="text-left py-3 px-4 font-medium text-gray-dark w-10"><input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary"></th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">用户信息</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">邮箱</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">专业/班级</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">注册日期</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">角色</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">状态</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">操作</th>
+              </tr></thead>
+              <tbody>
+                <tr class="border-b border-gray-100 table-row-hover">
+                  <td class="py-3 px-4"><input type="checkbox"></td>
+                  <td class="py-3 px-4"><div class="flex items-center gap-3">
+                    <img src="https://picsum.photos/id/1012/200/200" alt="头像" class="w-9 h-9 rounded-full">
+                    <div><p class="font-medium">张三</p><p class="text-xs text-gray-dark">#USR-2854</p></div>
+                  </div></td>
+                  <td class="py-3 px-4">zhangsan@example.com</td>
+                  <td class="py-3 px-4">计算机科学与技术/计科2101</td>
+                  <td class="py-3 px-4 text-gray-dark">2021-09-01</td>
+                  <td class="py-3 px-4"><span class="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs">大一学生</span></td>
+                  <td class="py-3 px-4"><span class="px-2 py-1 bg-success/10 text-success rounded-full text-xs">活跃</span></td>
+                  <td class="py-3 px-4">
+                    <button class="text-primary hover:text-primary/80 mr-3">查看</button>
+                    <button class="text-gray-dark hover:text-danger">删除</button>
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100 table-row-hover">
+                  <td class="py-3 px-4"><input type="checkbox"></td>
+                  <td class="py-3 px-4"><div class="flex items-center gap-3">
+                    <img src="https://picsum.photos/id/1027/200/200" alt="头像" class="w-9 h-9 rounded-full">
+                    <div><p class="font-medium">李四</p><p class="text-xs text-gray-dark">#USR-3621</p></div>
+                  </div></td>
+                  <td class="py-3 px-4">lisi@example.com</td>
+                  <td class="py-3 px-4">软件工程/软件2003</td>
+                  <td class="py-3 px-4 text-gray-dark">2020-09-01</td>
+                  <td class="py-3 px-4"><span class="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs">大二学生</span></td>
+                  <td class="py-3 px-4"><span class="px-2 py-1 bg-success/10 text-success rounded-full text-xs">活跃</span></td>
+                  <td class="py-3 px-4">
+                    <button class="text-primary hover:text-primary/80 mr-3">查看</button>
+                    <button class="text-gray-dark hover:text-danger">删除</button>
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100 table-row-hover">
+                  <td class="py-3 px-4"><input type="checkbox"></td>
+                  <td class="py-3 px-4"><div class="flex items-center gap-3">
+                    <img src="https://picsum.photos/id/1066/200/200" alt="头像" class="w-9 h-9 rounded-full">
+                    <div><p class="font-medium">王五</p><p class="text-xs text-gray-dark">#USR-4189</p></div>
+                  </div></td>
+                  <td class="py-3 px-4">wangwu@example.com</td>
+                  <td class="py-3 px-4">电子信息工程/电信1902</td>
+                  <td class="py-3 px-4 text-gray-dark">2019-09-01</td>
+                  <td class="py-3 px-4"><span class="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs">大三学生</span></td>
+                  <td class="py-3 px-4"><span class="px-2 py-1 bg-success/10 text-success rounded-full text-xs">活跃</span></td>
+                  <td class="py-3 px-4">
+                    <button class="text-primary hover:text-primary/80 mr-3">查看</button>
+                    <button class="text-gray-dark hover:text-danger">删除</button>
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100 table-row-hover">
+                  <td class="py-3 px-4"><input type="checkbox"></td>
+                  <td class="py-3 px-4"><div class="flex items-center gap-3">
+                    <img src="https://picsum.photos/id/1074/200/200" alt="头像" class="w-9 h-9 rounded-full">
+                    <div><p class="font-medium">赵六</p><p class="text-xs text-gray-dark">#USR-5276</p></div>
+                  </div></td>
+                  <td class="py-3 px-4">zhaoliu@example.com</td>
+                  <td class="py-3 px-4">数学与应用数学/数学1801</td>
+                  <td class="py-3 px-4 text-gray-dark">2018-09-01</td>
+                  <td class="py-3 px-4"><span class="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs">大四学生</span></td>
+                  <td class="py-3 px-4"><span class="px-2 py-1 bg-gray-light text-gray-dark rounded-full text-xs">离线</span></td>
+                  <td class="py-3 px-4">
+                    <button class="text-primary hover:text-primary/80 mr-3">查看</button>
+                    <button class="text-gray-dark hover:text-danger">删除</button>
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100 table-row-hover">
+                  <td class="py-3 px-4"><input type="checkbox"></td>
+                  <td class="py-3 px-4"><div class="flex items-center gap-3">
+                    <img src="https://picsum.photos/id/1083/200/200" alt="头像" class="w-9 h-9 rounded-full">
+                    <div><p class="font-medium">钱七</p><p class="text-xs text-gray-dark">#USR-1042</p></div>
+                  </div></td>
+                  <td class="py-3 px-4">qianqi@example.com</td>
+                  <td class="py-3 px-4">计算机学院/人工智能系</td>
+                  <td class="py-3 px-4 text-gray-dark">2017-03-15</td>
+                  <td class="py-3 px-4"><span class="px-2 py-1 bg-warning/10 text-warning rounded-full text-xs">教师</span></td>
+                  <td class="py-3 px-4"><span class="px-2 py-1 bg-success/10 text-success rounded-full text-xs">活跃</span></td>
+                  <td class="py-3 px-4">
+                    <button class="text-primary hover:text-primary/80 mr-3">查看</button>
+                    <button class="text-gray-dark hover:text-danger">删除</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+            <div class="text-sm text-gray-dark">显示 1-5 条，共 12,847 条记录</div>
+            <div class="flex gap-2">
+              <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-dark hover:bg-gray-light disabled:opacity-50" disabled>
+                <i class="fa fa-angle-left"></i>
+              </button>
+              <button class="w-9 h-9 flex items-center justify-center rounded bg-primary text-white">1</button>
+              <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-light">2</button>
+              <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-light">3</button>
+              <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-light">...</button>
+              <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-light">2570</button>
+              <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-dark hover:bg-gray-light">
+                <i class="fa fa-angle-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 内容管理页面：保持不变 -->
+      <div class="page hidden" id="content-management-page">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+          <div><h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold">内容管理</h2><p class="text-gray-dark">管理系统中学生的提问内容</p></div>
+          <div class="flex gap-3">
+            <div class="relative"><input type="text" placeholder="搜索提问..." class="pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary w-full md:w-64"><i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-dark"></i></div>
+            <button class="btn btn-primary"><i class="fa fa-plus"></i><span>发布公告</span></button>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100">
+            <div class="flex items-start justify-between">
+              <div><p class="text-gray-dark text-sm mb-1">总提问数</p><h3 class="text-3xl font-bold mb-2">42,195</h3><p class="text-success text-sm flex items-center"><i class="fa fa-arrow-up mr-1"></i> 15.7% <span class="text-gray-dark ml-1">较上月</span></p></div>
+              <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary"><i class="fa fa-question-circle text-xl"></i></div>
+            </div>
+          </div>
+          <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100">
+            <div class="flex items-start justify-between">
+              <div><p class="text-gray-dark text-sm mb-1">已回答</p><h3 class="text-3xl font-bold mb-2">42,171</h3><p class="text-success text-sm flex items-center"><i class="fa fa-check-circle mr-1"></i> 99.9%</p></div>
+              <div class="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center text-success"><i class="fa fa-check text-xl"></i></div>
+            </div>
+          </div>
+          <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100">
+            <div class="flex items-start justify-between">
+              <div><p class="text-gray-dark text-sm mb-1">未回答</p><h3 class="text-3xl font-bold mb-2">24</h3><p class="text-danger text-sm flex items-center"><i class="fa fa-exclamation-circle mr-1"></i> 0.1%</p></div>
+              <div class="w-12 h-12 rounded-lg bg-danger/10 flex items-center justify-center text-danger"><i class="fa fa-times text-xl"></i></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100 mb-6">
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div class="flex flex-wrap gap-2">
+              <button class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">全部提问</button>
+              <button class="px-3 py-1 bg-gray-light text-gray-dark rounded-full text-sm hover:bg-gray-200">已回答</button>
+              <button class="px-3 py-1 bg-gray-light text-gray-dark rounded-full text-sm hover:bg-gray-200">未回答</button>
+              <button class="px-3 py-1 bg-gray-light text-gray-dark rounded-full text-sm hover:bg-gray-200">本周新增</button>
+            </div>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead><tr class="border-b border-gray-200">
+                <th class="text-left py-3 px-4 font-medium text-gray-dark w-10"><input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary"></th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">学生提问</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">提问学生</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">提问时间</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">回答状态</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">操作</th>
+              </tr></thead>
+              <tbody>
+                <tr class="border-b border-gray-100 table-row-hover">
+                  <td class="py-3 px-4"><input type="checkbox"></td>
+                  <td class="py-3 px-4"><div class="flex items-start gap-3">
+                    <div class="w-16 h-12 bg-primary/5 rounded flex items-center justify-center text-primary"><i class="fa fa-question text-xl"></i></div>
+                    <div>
+                      <p class="font-medium">如何正确提交课程作业？系统总是提示格式错误</p>
+                      <p class="text-xs text-gray-dark mt-1">ID: #QST-8762</p>
+                    </div>
+                  </div></td>
+                  <td class="py-3 px-4"><div class="flex items-center gap-2">
+                    <img src="https://picsum.photos/id/1012/40/40" alt="头像" class="w-6 h-6 rounded-full">
+                    <span>张三 (大一)</span>
+                  </div></td>
+                  <td class="py-3 px-4 text-gray-dark">2023-06-15 08:45:32</td>
+                  <td class="py-3 px-4"><span class="px-2 py-1 bg-success/10 text-success rounded-full text-xs">已回答</span></td>
+                  <td class="py-3 px-4">
+                    <button class="text-primary hover:text-primary/80 mr-3">查看</button>
+                    <button class="text-gray-dark hover:text-danger">删除</button>
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100 table-row-hover">
+                  <td class="py-3 px-4"><input type="checkbox"></td>
+                  <td class="py-3 px-4"><div class="flex items-start gap-3">
+                    <div class="w-16 h-12 bg-primary/5 rounded flex items-center justify-center text-primary"><i class="fa fa-question text-xl"></i></div>
+                    <div>
+                      <p class="font-medium">高等数学的课后习题答案在哪里可以找到？</p>
+                      <p class="text-xs text-gray-dark mt-1">ID: #QST-8759</p>
+                    </div>
+                  </div></td>
+                  <td class="py-3 px-4"><div class="flex items-center gap-2">
+                    <img src="https://picsum.photos/id/1027/40/40" alt="头像" class="w-6 h-6 rounded-full">
+                    <span>李四 (大二)</span>
+                  </div></td>
+                  <td class="py-3 px-4 text-gray-dark">2023-06-15 07:18:45</td>
+                  <td class="py-3 px-4"><span class="px-2 py-1 bg-success/10 text-success rounded-full text-xs">已回答</span></td>
+                  <td class="py-3 px-4">
+                    <button class="text-primary hover:text-primary/80 mr-3">查看</button>
+                    <button class="text-gray-dark hover:text-danger">删除</button>
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100 table-row-hover">
+                  <td class="py-3 px-4"><input type="checkbox"></td>
+                  <td class="py-3 px-4"><div class="flex items-start gap-3">
+                    <div class="w-16 h-12 bg-primary/5 rounded flex items-center justify-center text-primary"><i class="fa fa-question text-xl"></i></div>
+                    <div>
+                      <p class="font-medium">学校图书馆的电子资源如何远程访问？</p>
+                      <p class="text-xs text-gray-dark mt-1">ID: #QST-8757</p>
+                    </div>
+                  </div></td>
+                  <td class="py-3 px-4"><div class="flex items-center gap-2">
+                    <img src="https://picsum.photos/id/1066/40/40" alt="头像" class="w-6 h-6 rounded-full">
+                    <span>王五 (大三)</span>
+                  </div></td>
+                  <td class="py-3 px-4 text-gray-dark">2023-06-14 22:15:12</td>
+                  <td class="py-3 px-4"><span class="px-2 py-1 bg-success/10 text-success rounded-full text-xs">已回答</span></td>
+                  <td class="py-3 px-4">
+                    <button class="text-primary hover:text-primary/80 mr-3">查看</button>
+                    <button class="text-gray-dark hover:text-danger">删除</button>
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100 table-row-hover">
+                  <td class="py-3 px-4"><input type="checkbox"></td>
+                  <td class="py-3 px-4"><div class="flex items-start gap-3">
+                    <div class="w-16 h-12 bg-primary/5 rounded flex items-center justify-center text-primary"><i class="fa fa-question text-xl"></i></div>
+                    <div>
+                      <p class="font-medium">毕业论文的格式要求有更新吗？在哪里可以下载最新模板？</p>
+                      <p class="text-xs text-gray-dark mt-1">ID: #QST-8755</p>
+                    </div>
+                  </div></td>
+                  <td class="py-3 px-4"><div class="flex items-center gap-2">
+                    <img src="https://picsum.photos/id/1074/40/40" alt="头像" class="w-6 h-6 rounded-full">
+                    <span>赵六 (大四)</span>
+                  </div></td>
+                  <td class="py-3 px-4 text-gray-dark">2023-06-14 15:36:48</td>
+                  <td class="py-3 px-4"><span class="px-2 py-1 bg-warning/10 text-warning rounded-full text-xs">未回答</span></td>
+                  <td class="py-3 px-4">
+                    <button class="text-primary hover:text-primary/80 mr-3">查看</button>
+                    <button class="text-gray-dark hover:text-danger">删除</button>
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100 table-row-hover">
+                  <td class="py-3 px-4"><input type="checkbox"></td>
+                  <td class="py-3 px-4"><div class="flex items-start gap-3">
+                    <div class="w-16 h-12 bg-primary/5 rounded flex items-center justify-center text-primary"><i class="fa fa-question text-xl"></i></div>
+                    <div>
+                      <p class="font-medium">下学期的选课时间是什么时候？有哪些注意事项？</p>
+                      <p class="text-xs text-gray-dark mt-1">ID: #QST-8752</p>
+                    </div>
+                  </div></td>
+                  <td class="py-3 px-4"><div class="flex items-center gap-2">
+                    <img src="https://picsum.photos/id/1012/40/40" alt="头像" class="w-6 h-6 rounded-full">
+                    <span>张三 (大一)</span>
+                  </div></td>
+                  <td class="py-3 px-4 text-gray-dark">2023-06-14 10:22:31</td>
+                  <td class="py-3 px-4"><span class="px-2 py-1 bg-success/10 text-success rounded-full text-xs">已回答</span></td>
+                  <td class="py-3 px-4">
+                    <button class="text-primary hover:text-primary/80 mr-3">查看</button>
+                    <button class="text-gray-dark hover:text-danger">删除</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+            <div class="text-sm text-gray-dark">显示 1-5 条，共 42,195 条记录</div>
+            <div class="flex gap-2">
+              <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-dark hover:bg-gray-light disabled:opacity-50" disabled>
+                <i class="fa fa-angle-left"></i>
+              </button>
+              <button class="w-9 h-9 flex items-center justify-center rounded bg-primary text-white">1</button>
+              <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-light">2</button>
+              <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-light">3</button>
+              <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-light">...</button>
+              <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-light">8440</button>
+              <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-dark hover:bg-gray-light">
+                <i class="fa fa-angle-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 系统设置页面：保持不变 -->
+      <div class="page hidden" id="system-settings-page">
+        <div class="mb-6">
+          <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold">系统设置</h2>
+          <p class="text-gray-dark">配置系统的各项参数和选项</p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100 lg:col-span-2">
+            <h3 class="font-bold text-lg mb-6">基础设置</h3>
+            <form class="space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-dark mb-2">系统名称</label>
+                  <input type="text" value="软件管理系统" class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-dark mb-2">系统版本</label>
+                  <input type="text" value="v2.3.1" class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" readonly>
+                </div>
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-dark mb-2">系统公告</label>
+                <textarea rows="3" class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">欢迎使用六星问知管理系统！请各位及时查收软件数据信息。</textarea>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-dark mb-2">自动登录</label>
+                  <div class="flex items-center gap-2">
+                    <input type="radio" id="auto-login-enable" name="auto-login" checked>
+                    <label for="auto-login-enable">启用</label>
+                    <input type="radio" id="auto-login-disable" name="auto-login">
+                    <label for="auto-login-disable">禁用</label>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-dark mb-2">默认语言</label>
+                  <select class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+                    <option selected>简体中文</option>
+                    <option>English</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                <button type="button" class="btn btn-outline">取消</button>
+                <button type="button" class="btn btn-primary">保存设置</button>
+              </div>
+            </form>
+          </div>
+          
+          <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100">
+            <h3 class="font-bold text-lg mb-6">安全设置</h3>
+            <form class="space-y-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-dark mb-2">密码策略</label>
+                <select class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+                  <option>低 (至少6位字符)</option>
+                  <option selected>中 (至少8位，包含数字和字母)</option>
+                  <option>高 (至少10位，包含大小写字母、数字和特殊字符)</option>
+                </select>
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-dark mb-2">会话超时时间</label>
+                <select class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+                  <option>30分钟</option>
+                  <option selected>1小时</option>
+                  <option>2小时</option>
+                  <option>4小时</option>
+                </select>
+              </div>
+              
+              <div>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" checked class="rounded border-gray-300 text-primary focus:ring-primary">
+                  <span>启用登录验证码</span>
+                </label>
+              </div>
+              
+              <div>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" checked class="rounded border-gray-300 text-primary focus:ring-primary">
+                  <span>启用操作日志记录</span>
+                </label>
+              </div>
+              
+              <div class="pt-4 border-t border-gray-100">
+                <button type="button" class="btn btn-primary w-full">更新安全设置</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        
+        <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100">
+          <h3 class="font-bold text-lg mb-6">模块管理</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-gray-200">
+                  <th class="text-left py-3 px-4 font-medium text-gray-dark w-10"><input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary"></th>
+                  <th class="text-left py-3 px-4 font-medium text-gray-dark">模块名称</th>
+                  <th class="text-left py-3 px-4 font-medium text-gray-dark">描述</th>
+                  <th class="text-left py-3 px-4 font-medium text-gray-dark">状态</th>
+                  <th class="text-left py-3 px-4 font-medium text-gray-dark">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-gray-100 table-row-hover">
+                  <td class="py-3 px-4"><input type="checkbox" checked></td>
+                  <td class="py-3 px-4">用户管理</td>
+                  <td class="py-3 px-4">管理系统用户账号和权限</td>
+                  <td class="py-3 px-4"><span class="px-2 py-1 bg-success/10 text-success rounded-full text-xs">启用</span></td>
+                  <td class="py-3 px-4">
+                    <button class="text-primary hover:text-primary/80 mr-3">配置</button>
+                    <button class="text-gray-dark hover:text-danger">禁用</button>
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100 table-row-hover">
+                  <td class="py-3 px-4"><input type="checkbox" checked></td>
+                  <td class="py-3 px-4">内容管理</td>
+                  <td class="py-3 px-4">管理学生提问和公告发布</td>
+                  <td class="py-3 px-4"><span class="px-2 py-1 bg-success/10 text-success rounded-full text-xs">启用</span></td>
+                  <td class="py-3 px-4">
+                    <button class="text-primary hover:text-primary/80 mr-3">配置</button>
+                    <button class="text-gray-dark hover:text-danger">禁用</button>
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100 table-row-hover">
+                  <td class="py-3 px-4"><input type="checkbox"></td>
+                  <td class="py-3 px-4">数据分析</td>
+                  <td class="py-3 px-4">系统使用数据分析和报表生成</td>
+                  <td class="py-3 px-4"><span class="px-2 py-1 bg-gray-light text-gray-dark rounded-full text-xs">禁用</span></td>
+                  <td class="py-3 px-4">
+                    <button class="text-primary hover:text-primary/80 mr-3">配置</button>
+                    <button class="text-gray-dark hover:text-success">启用</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 引入自定义JS -->
+  <script src="./assets/js/navigation.js"></script>
+  <script src="./assets/js/charts.js"></script>
+  <script src="./assets/js/main.js"></script>
+
+  <!-- 图表初始化：新增内容分类柱形图，调整布局适配 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof initCharts === 'function') {
+        initCharts = function() {
+          // 1. 用户年级分布（保留大一-大四，无教师）
+          const userGradeCtx = document.getElementById('user-grade-chart');
+          if (userGradeCtx) {
+            new Chart(userGradeCtx, {
+              type: 'doughnut',
+              data: {
+                labels: ['大一', '大二', '大三', '大四'],
+                datasets: [{
+                  data: [35, 28, 22, 15],
+                  backgroundColor: ['#34D399', '#87CEEB', '#FFE4B5', '#FFE4E1'],
+                  borderWidth: 0
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                  legend: { position: 'bottom', labels: { font: { size: 12 } } } 
+                },
+                cutout: '70%'
+              }
+            });
+          }
+
+          // 2. 用户学院分布
+          const userCollegeCtx = document.getElementById('user-college-chart');
+          if (userCollegeCtx) {
+            new Chart(userCollegeCtx, {
+              type: 'doughnut',
+              data: {
+                labels: ['计算机学院', '电子信息学院', '数学学院', '文学院'],
+                datasets: [{
+                  data: [40, 25, 18, 17],
+                  backgroundColor: ['#34D399', '#87CEEB', '#FFE4B5', '#FFE4E1'],
+                  borderWidth: 0
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                  legend: { position: 'bottom', labels: { font: { size: 12 } } } 
+                },
+                cutout: '70%'
+              }
+            });
+          }
+
+          // 3. 新增：内容分类柱形图（按需求分7类）
+          const contentCategoryCtx = document.getElementById('content-category-chart');
+          if (contentCategoryCtx) {
+            new Chart(contentCategoryCtx, {
+              type: 'bar',
+              data: {
+                labels: ['学习/资料', '生活/吐槽', '表白/情感', '求助/攻略', '组队/组局', '闲置/交易', '寻物/招领'],
+                datasets: [{
+                  label: '内容数量',
+                  data: [12800, 9500, 6200, 5800, 4300, 3200, 795], // 合理分配各类别数量
+                  backgroundColor: [
+                    '#34D399', '#10B981', '#6EE7B7', '#059669', 
+                    '#A7F3D0', '#99F6E4', '#CCFBF1'
+                  ],
+                  borderRadius: 4,
+                  borderWidth: 0
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y', // 横向柱形图，避免标签文字拥挤
+                plugins: {
+                  legend: { display: false }, // 单数据集无需图例
+                  tooltip: {
+                    backgroundColor: '#1D2129',
+                    padding: 10,
+                    titleFont: { size: 14 },
+                    bodyFont: { size: 12 }
+                  }
+                },
+                scales: {
+                  x: {
+                    beginAtZero: true,
+                    grid: { display: false },
+                    ticks: { font: { size: 11 } }
+                  },
+                  y: {
+                    grid: { color: '#F2F3F5' },
+                    ticks: { font: { size: 12 } }
+                  }
+                }
+              }
+            });
+          }
+
+          // 4. 软件使用趋势图
+          const usageTrendCtx = document.getElementById('usage-trend-chart');
+          if (usageTrendCtx) {
+            new Chart(usageTrendCtx, {
+              type: 'line',
+              data: {
+                labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                datasets: [
+                  {
+                    label: '活跃用户',
+                    data: [5400, 5800, 6200, 5900, 6500, 4200, 3800],
+                    borderColor: '#10B981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                  },
+                  {
+                    label: '提问数量',
+                    data: [1250, 1320, 1480, 1390, 1520, 980, 870],
+                    borderColor: '#34D399',
+                    backgroundColor: 'rgba(52, 211, 153, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                  }
+                ]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { font: { size: 12 } } } },
+                scales: { 
+                  y: { beginAtZero: true, grid: { color: '#F2F3F5' } },
+                  x: { grid: { display: false } }
+                }
+              }
+            });
+          }
+        }
+      }
+      initCharts();
+    });
+  </script>
+</body>
+</html>
