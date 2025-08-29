@@ -59,6 +59,7 @@ const send = async () => {
   }
 };
 
+
   const openImagePicker = () => fileRef.current?.click();
 
   return (
@@ -75,7 +76,7 @@ const send = async () => {
                   </div>
                 )}
                 <div className={`bubble ${m.role}`}>
-                  {String(m.textResponse)}
+                  {m.textResponse}
                   <span className="tail" />
                 </div>
               </div>
@@ -185,6 +186,8 @@ const send = async () => {
             0 1px 0 rgba(16,94,72,.06),
             0 0 0 1px rgba(125, 226, 182, .18),
             0 6px 16px rgba(143,223,240,.18); /* 轻微青蓝光晕 */
+          white-space: pre-line; /* 添加这行代码 */
+          word-break: break-word; 
         }
         .bubble.assistant .tail{
           position:absolute;left:-6px;top:50%;transform:translateY(-50%);

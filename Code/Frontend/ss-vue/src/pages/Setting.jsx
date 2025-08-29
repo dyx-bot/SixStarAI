@@ -3,7 +3,7 @@ import { getAuth } from "../auth/storage";
 import { uploadAvatarApi } from "../lib/api";
 import "./Setting.css";
 import {BASE} from "../lib/api"
-
+import { ElMessage } from 'element-plus';
 export default function Setting() {
   // ✅ 直接从 getAuth() 中解构字段
   const { id, username, avatar, college, grade } = getAuth();
@@ -71,15 +71,10 @@ const handleFileChange = async (e) => {
       console.log("服务端返回的数据:", data);
 
       if (data.success) {
-        let avatarPath = data.avatar;
+        const fullAvatarUrl=`${BASE}${data.avatar}`
 
-        // 如果 avatarPath 是相对路径，拼接为完整路径
-        const fullAvatarUrl = avatarPath.startsWith("http")
-          ? avatarPath
-          : `${BASE}${avatarPath.startsWith("/") ? "" : "/"}${avatarPath}`;
-
-        setAvatarUrl(fullAvatarUrl || base64);
-        localStorage.setItem("auth_user_avatar", fullAvatarUrl || base64);
+        setAvatarUrl(fullAvatarUrl);
+        localStorage.setItem("auth_user_avatar", fullAvatarUrl);
       } else {
         alert("上传失败：" + (data.message || "未知错误"));
       }
@@ -107,14 +102,14 @@ const handleUsernameSave = async() => {
     });
     const data = await res.json();
     if (data.success) {
-      alert("用户名已修改为：" + usernameText);
+      ElMessage.success("用户名已修改为：" + usernameText);
       // 同步到localStorage
       localStorage.setItem("auth_user_name", usernameText);
     } else {
-      alert("修改失败：" + (data.message || "未知错误"));
+      ElMessage.error("修改失败：" + (data.message || "未知错误"));
     }
   } catch (err) {
-    alert("修改失败：" + err.message);
+    ElMessage.error("修改失败：" + err.message);
   }
 };
 

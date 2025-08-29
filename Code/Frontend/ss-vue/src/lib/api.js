@@ -1,5 +1,5 @@
 // 后端接口基础地址（必须写后端真实地址，如 http://localhost:3000，不能是相对路径）
-export const BASE =  'http://10.10.24.169:8080'; 
+export const BASE =  'http://10.10.24.52:8080'; 
 
 // 通用请求函数（封装fetch，添加必要的请求头和错误处理）
 const request = async (url, options = {}) => {
