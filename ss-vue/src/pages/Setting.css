@@ -1,0 +1,145 @@
+.setting {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #e6f7f2;
+  padding: 20px;
+}
+
+.setting-container {
+  width: 100%;
+  max-width: 400px;
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 1px 0 #edf6f1;
+  overflow: hidden;
+  padding: 20px;
+}
+
+.setting-card {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  background: #f8fffc;
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+.setting-avatar-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.setting-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.setting-avatar:hover {
+  transform: scale(1.05);
+}
+
+/* Setting.css */
+.setting-username-text {
+  border-bottom: 1px dashed #409eff;
+  color: #409eff;
+}
+.setting-username-text:hover {
+  color: #66b1ff;
+}
+
+.setting-username:hover {
+  transform: scale(1.02);
+}
+
+.setting-username[contenteditable="true"] {
+  background: #fff;
+  border-bottom: 1px dashed #22a06e;
+  outline: none;
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f7f4;
+  font-size: 14px;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.label {
+  color: #6a8f82;
+  font-weight: 500;
+}
+
+.value {
+  color: #184a38;
+  font-weight: 600;
+}
+
+.save-btn {
+  width: 100%;
+  padding: 12px;
+  background: #22a06e;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: background 0.2s;
+}
+
+.save-btn:hover {
+  background: #1c8a58;
+}
+
+.back-link {
+  display: block;
+  text-align: center;
+  color: #184a38;
+  text-decoration: underline;
+  font-size: 14px;
+  margin-top: 20px;
+  padding: 8px;
+}
+
+.back-link:hover {
+  color: #22a06e;
+}
+
+/* 添加以下样式到 Setting.css */
+
+.setting-avatar.uploading {
+  opacity: 0.6;
+}
+
+.upload-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.setting-avatar-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}

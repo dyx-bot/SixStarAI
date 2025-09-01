@@ -1,0 +1,166 @@
+:root{
+  --mint-1:#7ee2b6;
+  --mint-2:#22a06e;
+  --ink:#184a38;
+  --bg: radial-gradient(900px 600px at 50% -10%, #d5f7ea 0%, #c8f1e2 35%, #bdebdc 60%, #b3e6d6 80%, #aee3d2 100%);
+}
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Plus Jakarta Sans","Microsoft YaHei",system-ui,sans-serif;
+  overflow:hidden; /* 关键：整页不滚 */
+}
+
+/* 外壳：手机居中画幅 */
+.m-app{height:100dvh;display:grid;grid-template-rows:auto 1fr auto;justify-content:center}
+
+.m-header,.m-main,.m-tabbar{width:min(420px,100vw)}
+
+/* 顶栏 */
+.m-header{
+  position:sticky;top:0;z-index:5;
+  padding:8px 12px;margin:0 auto;
+  background:rgba(255,255,255,.72);backdrop-filter:blur(10px);
+  border-radius:0 0 16px 16px;box-shadow:0 6px 16px rgba(22,107,78,.10);
+}
+.m-header__brand{display:flex;align-items:center;gap:8px}
+.m-header__brand img{width:24px;height:24px;border-radius:50%}
+.m-header__title{font-weight:900;letter-spacing:.06em;color:#166b4e}
+
+/* 主体（把滚动权交给内部页面） */
+.m-main{
+ margin:8px auto 72px;padding:0 8px 8px;
+ min-height:0;               /* 允许压缩 */
+ overflow:hidden;            /* 自己不滚 */
+ display:grid;grid-template-rows:1fr;
+ }
+.m-main > *{min-height:0;}    /* 继续把“可压缩能力”传给子页 */
+
+/* ＝＝ 扁扁的底部 TabBar ＝＝ */
+.m-tabbar{
+  position:fixed;left:50%;bottom:8px;transform:translateX(-50%);
+  background:#fff;border:1px solid #e6f5ee;border-radius:18px;
+  display:flex;justify-content:space-around;align-items:center;gap:4px;
+  padding:6px 6px;      /* 竖向更薄 */
+  height:56px;          /* 固定矮一些 */
+  box-shadow:0 10px 20px rgba(34,160,110,.16);
+  z-index:6;
+}
+.m-tab{
+  flex:1;min-width:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  padding:6px 8px;border-radius:12px;text-decoration:none;
+  color:#2a6a55;font-size:13px;line-height:1;
+}
+.m-tab svg{color:#2a6a55}
+.m-active{
+  background:linear-gradient(180deg,#ffffff,#f0fff7);
+  color:#166b4e;border:1px solid #bdebdc;
+}
+.m-active svg{color:#166b4e}
+
+/* 通用浅绿按钮 */
+.m-btn{
+  background:linear-gradient(180deg,var(--mint-1),var(--mint-2));
+  color:#fff;border:none;border-radius:12px;padding:10px 12px;font-weight:700;cursor:pointer;
+}
+.m-btn:active{transform:scale(.98)}
+
+/* === 扁扁的底部 TabBar（纯图标） === */
+.m-tabbar{
+  position:fixed; left:50%; bottom:10px; transform:translateX(-50%);
+  background:#fff; border:1px solid #e6f5ee;
+  border-radius:22px;
+  display:flex; align-items:center; justify-content:space-between; gap:6px;
+
+  /* 更扁：整体高度更低，内边距更小 */
+  height:44px;           /* 原来是 56px */
+  padding:4px 6px;       /* 原来 6px 6px */
+
+  box-shadow:0 10px 20px rgba(34,160,110,.14);
+  z-index:6;
+  width:min(420px, 95vw);   /* 保持居中且不顶边 */
+}
+
+/* 单个 tab：只显示图标 */
+.m-tab{
+  flex:1; min-width:0;
+  display:flex; align-items:center; justify-content:center;
+  padding:6px 8px;
+  border-radius:14px;
+  color:#2a6a55; text-decoration:none;
+}
+
+/* 图标大小 */
+.m-tab__icon{
+  width:22px; height:22px;   /* 适配更扁的高度 */
+}
+
+/* 选中态：薄薄的渐变&描边，和你全站风格一致 */
+.m-active{
+  background:linear-gradient(180deg,#ffffff,#f0fff7);
+  color:#166b4e;
+  border:1px solid #bdebdc;
+  box-shadow:0 6px 16px rgba(34,160,110,.08) inset;
+}
+
+/* 可选：轻触时的反馈 */
+.m-tab:active{ transform:translateY(0.5px); }
+
+/* 底部栏图标尺寸（更大、更清晰） */
+.m-tab__icon { width: 28px; height: 28px; }
+
+/* 可选：在大屏上再大一点 */
+@media (min-width: 480px) {
+  .m-tab__icon { width: 30px; height: 30px; }
+}
+/* ========= 全局参数（按需微调即可） ========= */
+:root{
+  --tabbar-h: 64px;                                /* 底部导航真实高度 */
+  --panel-gap: 6px;                                /* 背景板与导航之间的“那一点点”间隙 */
+  --fab-offset: 24px;                              /* 发布按钮距离导航的额外间距（维持原位置感觉） */
+  --safe-bottom: env(safe-area-inset-bottom, 0px); /* iPhone 刘海/底部安全区 */
+}
+
+/* ========= 全局固定浅绿背景板 ========= */
+/* 选择你页面最外层容器（示例用 .m-app；若你用 #root/.app-root，请把 .m-app 换成你的类名） */
+html, body, #root { height: 100%; }
+.m-app { min-height: 100%; position: relative; }
+
+/* 把浅绿面板固定到视口里，底边刚好接到导航上方一点点 */
+.m-app::before{
+  content:"";
+  position: fixed;                       /* 固定，不随内容滚动 */
+  z-index: 0;
+  pointer-events: none;                  /* 避免挡住点击 */
+  left: 425px;
+  right: 425px;
+  top: 12px;                             /* 背景板上边距，保持你的视觉 */
+  bottom: calc(var(--tabbar-h) + var(--panel-gap) + var(--safe-bottom));
+  border-radius: 28px;
+  background:
+    radial-gradient(120% 90% at 50% -20%,
+      #fafffd 0%,
+      #f0fff8 35%,
+      #e9f7f1 65%,
+      #e3f3ed 100%);
+  box-shadow: 0 18px 40px rgba(22,107,78,.16);
+}
+
+/* 页面真实内容盖在背景板之上 */
+.m-app > *{ position: relative; z-index: 1; }
+
+/* 如果你之前在讨论页里还有一个“小面板”，为了避免双重背景，把它关掉 */
+.lx-discussion .lx-shell::before{ content: none !important; }
+
+/* ========= 发布动态按钮：保持原本悬浮在导航上方一点 ========= */
+.lx-fab{
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(var(--tabbar-h) + var(--fab-offset) + var(--safe-bottom));
+  z-index: 120;                          /* 高于背景板和导航 */
+  /* 其余你原来的样式不动（颜色/阴影/圆角等保持之前） */
+}
+
