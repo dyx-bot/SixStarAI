@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+<<<<<<< HEAD
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -152,4 +153,190 @@
     });
   </script>
 </body>
+=======
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>六星问知 - 软件管理系统</title>
+    <!-- 引入第三方CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+
+    <!-- 配置Tailwind主题：延续主系统色调 -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#34D399', // 浅绿主色
+              secondary: '#10B981', // 深绿辅助色
+              dark: '#1D2129',
+              'gray-light': '#F2F3F5',
+              'gray-medium': '#C9CDD4',
+              'gray-dark': '#86909C'
+            },
+            fontFamily: {
+              inter: ['Inter', 'system-ui', 'sans-serif'],
+            },
+          },
+        }
+      }
+    </script>
+
+
+    <style type="text/tailwindcss">
+      @layer utilities {
+        .login-gradient {
+          background: linear-gradient(135deg, #F0FDF4 0%, #E6FFFA 100%);
+        }
+        .input-focus {
+          @apply focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary;
+        }
+        .btn-hover {
+          @apply hover:shadow-lg hover:scale-[1.02] transition-all duration-300;
+        }
+      }
+    </style>
+
+
+  </head>
+
+
+  <body class="font-inter min-h-screen flex items-center justify-center login-gradient p-4">
+    <!-- 登录卡片 - 放大尺寸 -->
+    <div class="w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
+      <!-- 顶部品牌区 -->
+      <div class="bg-secondary p-8 text-center">
+        <!-- 替换为新图标 -->
+        <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
+          <img src="/校徽.png" alt="六星问知图标" class="w-full h-full object-contain p-2">
+          <!-- 请将your-logo.png替换为实际图标路径 -->
+        </div>
+        <h1 class="text-[clamp(1.6rem,4vw,2rem)] font-bold text-white">六星问知</h1>
+        <p class="text-white/80 mt-2 text-lg">软件管理系统</p>
+      </div>
+      <!-- 表单区 - 放大输入框和间距 -->
+      <div class="p-8">
+        <form id="loginForm" class="space-y-6">
+          <!-- 账号输入 -->
+          <div>
+            <label class="block text-sm font-medium text-gray-dark mb-2" for="username">
+              <i class="fa fa-user mr-1"></i> 管理员账号
+            </label>
+            <div class="relative">
+              <input 
+                type="text" 
+                id="username" 
+                placeholder="请输入账号（默认：admin）" 
+                class="w-full px-5 py-4 rounded-lg border border-gray-medium input-focus text-base"
+                value="admin" 
+                required
+              >
+            </div>
+          </div>
+          <!-- 密码输入 -->
+          <div>
+            <label class="block text-sm font-medium text-gray-dark mb-2" for="password">
+              <i class="fa fa-lock mr-1"></i> 密码
+            </label>
+            <div class="relative">
+              <input 
+                type="password" 
+                id="password" 
+                placeholder="请输入密码（默认：123456）" 
+                class="w-full px-5 py-4 rounded-lg border border-gray-medium input-focus text-base"
+                value="123456" 
+                required
+              >
+              <!-- 密码可见切换 -->
+              <button type="button" id="togglePwd" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-dark hover:text-primary text-lg">
+                <i class="fa fa-eye-slash"></i>
+              </button>
+            </div>
+          </div>
+          <!-- 记住账号 -->
+          <div class="flex items-center">
+            <input type="checkbox" id="remember" class="rounded border-gray-medium text-primary focus:ring-primary w-5 h-5">
+            <label for="remember" class="ml-2 text-sm text-gray-dark">记住账号</label>
+          </div>
+          <!-- 登录按钮 - 放大尺寸 -->
+          <button 
+            type="submit" 
+            class="w-full bg-secondary text-white font-medium py-4 px-6 rounded-lg btn-hover flex items-center justify-center gap-2 text-base"
+          >
+            <i class="fa fa-sign-in"></i>
+            <span>登录系统</span>
+          </button>
+        </form>
+      </div>
+      <!-- 底部提示 -->
+      <div class="bg-gray-light p-5 text-center text-sm text-gray-dark">
+        <p>© 2025 六星问知 | 管理员权限专属</p>
+      </div>
+    </div>
+
+    <!-- 登录逻辑JS -->
+    <script>
+      const BASE = 'http://10.10.24.99:8080';
+
+      document.addEventListener('DOMContentLoaded', function() {
+        // 1. 密码可见性切换
+        const togglePwd = document.getElementById('togglePwd');
+        const password = document.getElementById('password');
+        togglePwd.addEventListener('click', function() {
+          const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+          password.setAttribute('type', type);
+          // 切换图标
+          this.innerHTML = type === 'password' ? '<i class="fa fa-eye-slash text-lg"></i>' : '<i class="fa fa-eye text-lg"></i>';
+        });
+
+        // 2. 登录表单提交（跳转至主系统页面）
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit', function (e) {
+          e.preventDefault(); // 阻止默认表单提交
+          const username = document.getElementById('username').value;
+          const password = document.getElementById('password').value;
+
+          // 简单验证
+          if (username.trim() && password.trim()) {
+            // 显示登录中状态
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i><span>登录中...</span>';
+
+            fetch(`${BASE}/api/admin/login`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ id:username, password })
+            })
+              .then(response => {
+                if (!response.ok) {
+                  // 非 2xx 响应（如 401 未授权）
+                  return response.json().then(errData => {
+                    throw new Error(errData.message || '登录失败');
+                  });
+                }
+                return response.json();
+              })
+              .then(data => {
+                // 登录成功，跳转页面（可根据实际需求携带 token 等信息）
+                window.location.href = 'index.html';
+              })
+              .catch(error => {
+                // 登录失败，提示错误并恢复按钮状态
+                alert(error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa fa-sign-in"></i><span>登录系统</span>';
+              });
+          } else {
+            alert('请填写完整的账号和密码！');
+          }
+        });
+      })
+  </script>
+  </body>
+>>>>>>> origin/wmk
 </html>

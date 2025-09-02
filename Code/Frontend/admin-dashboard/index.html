@@ -39,6 +39,7 @@
       }
     }
   </script>
+<<<<<<< HEAD
 </head>
 <body class="font-inter bg-main-bg text-dark min-h-screen flex overflow-hidden">
   <!-- 左侧导航栏：字号从text-2xl微调至text-xl，保持清晰且不拥挤 -->
@@ -47,10 +48,93 @@
       <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
         <i class="fa fa-cogs text-white text-xl"></i>
       </div>
+=======
+
+  <style>
+/* 自定义表格样式 */
+.table-container {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.table-container table {
+  width: 100%;
+  min-width: 800px; /* 设置最小宽度 */
+  border-collapse: collapse;
+}
+
+.table-container th,
+.table-container td {
+  padding: 12px 16px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table-container th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  color: #475569;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.table-container tr:hover {
+  background-color: #f1f5f9;
+}
+
+.table-container .table-row-hover:hover {
+  background-color: #f1f5f9;
+}
+
+/* 调整响应式断点 */
+@media (max-width: 1024px) {
+  .table-container table {
+    min-width: 600px;
+  }
+  
+  .table-container th,
+  .table-container td {
+    padding: 8px 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-container table {
+    min-width: 400px;
+  }
+  
+  .table-container th,
+  .table-container td {
+    padding: 6px 8px;
+    font-size: 14px;
+  }
+}
+
+ #post-modal {
+    transition: opacity 0.3s ease;
+  }
+  #post-modal.hidden {
+    opacity: 0;
+    pointer-events:none;
+  }
+</style>
+</head>
+
+
+<body class="font-inter bg-main-bg text-dark min-h-screen flex overflow-hidden">
+  <!-- 左侧导航栏：字号从text-2xl微调至text-xl，保持清晰且不拥挤 -->
+  <aside id="sidebar" class="w-60 bg-sidebar-bg border-r border-gray-200 h-screen flex-shrink-0 transition-all duration-300 ease-in-out z-30">
+
+    <div class="p-4 border-b border-gray-600/30 flex items-center gap-3">
+      <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+        <img src="/AI.jpg" alt="" class="w-10 h-10 rounded-full object-cover border-2 border-white/50">
+      </div>
+
+>>>>>>> origin/wmk
       <h1 class="text-xl font-bold text-white">六星问知</h1>
       <button id="close-sidebar" class="ml-auto lg:hidden text-gray-200 hover:text-white text-xl">
         <i class="fa fa-times"></i>
       </button>
+<<<<<<< HEAD
     </div>
     <nav class="p-3 flex-grow overflow-y-auto">
       <p class="text-sm uppercase text-gray-300/70 font-medium mb-3 px-3">主要功能</p>
@@ -76,18 +160,47 @@
         </a></li>
       </ul>
     </nav>
+=======
+
+    </div>
+
+    <nav class="p-3 flex-grow overflow-y-auto">
+      <p class="text-sm uppercase text-gray-300/70 font-medium mb-3 px-3">主要功能</p>
+      <ul class="space-y-2">
+        
+      <!-- 用户管理 -->
+      <li><a href="?page=user-management" class="sidebar-item flex items-center gap-4 py-4 px-3 text-white hover:bg-primary/20 hover:text-primary rounded-md transition-colors" data-target="user-management">
+        <i class="fa fa-users w-7 text-center text-xl"></i>
+        <span class="text-xl font-medium">用户管理</span>
+      </a></li>
+
+      <!-- 内容管理 -->
+      <li><a href="?page=content-management" class="sidebar-item flex items-center gap-4 py-4 px-3 text-white hover:bg-primary/20 hover:text-primary rounded-md transition-colors" data-target="content-management">
+        <i class="fa fa-file-text w-7 text-center text-xl"></i>
+        <span class="text-xl font-medium">内容管理</span>
+      </a></li>
+      </ul> 
+    </nav>
+
+>>>>>>> origin/wmk
     <div class="p-4 border-t border-gray-600/30">
       <div class="flex items-center gap-3">
         <img src="https://picsum.photos/id/1005/200/200" alt="管理员头像" class="w-10 h-10 rounded-full object-cover border-2 border-white/50">
         <div>
           <p class="font-medium text-xl text-white">管理员</p>
+<<<<<<< HEAD
           <p class="text-base text-gray-300">admin@example.com</p>
         </div>
         <button class="ml-auto text-gray-300 hover:text-primary transition-colors text-xl">
+=======
+        </div>
+        <button class="ml-auto text-gray-300 hover:text-primary transition-colors text-xl" onclick="logout()">
+>>>>>>> origin/wmk
           <i class="fa fa-sign-out"></i>
         </button>
       </div>
     </div>
+<<<<<<< HEAD
   </aside>
 
   <main class="flex-1 flex flex-col overflow-hidden">
@@ -102,6 +215,19 @@
       <div class="flex items-center gap-5">
         <button class="relative text-gray-dark hover:text-primary transition-colors"><i class="fa fa-bell text-xl"></i><span class="absolute -top-1 -right-1 w-4 h-4 bg-danger rounded-full text-white text-xs flex items-center justify-center">3</span></button>
         <button class="relative text-gray-dark hover:text-primary transition-colors"><i class="fa fa-envelope text-xl"></i><span class="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full text-white text-xs flex items-center justify-center">5</span></button>
+=======
+
+  </aside>
+
+  <main class="flex-1 flex flex-col overflow-hidden">
+
+    <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 z-20">
+      <div class="flex items-center gap-4">
+        <button id="toggle-sidebar" class="lg:hidden text-gray-dark hover:text-primary"><i class="fa fa-bars text-xl"></i></button>
+        
+      </div>
+      <div class="flex items-center gap-5">
+>>>>>>> origin/wmk
         <div class="border-l border-gray-200 h-8"></div>
         <div class="flex items-center gap-3">
           <img src="https://picsum.photos/id/1005/200/200" alt="管理员头像" class="w-9 h-9 rounded-full object-cover border-2 border-white shadow-sm">
@@ -110,6 +236,7 @@
     </header>
 
     <div class="flex-1 overflow-y-auto p-6 bg-main-bg" id="page-content">
+<<<<<<< HEAD
       <!-- 数据概览页面：新增内容分类柱形图，与两张用户分布图并列 -->
       <div class="page active" id="dashboard-page">
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
@@ -191,22 +318,53 @@
           <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100"><div class="flex items-start justify-between"><div><p class="text-gray-dark text-sm mb-1">总用户</p><h3 class="text-3xl font-bold mb-2">12,847</h3><p class="text-success text-sm flex items-center"><i class="fa fa-arrow-up mr-1"></i> 12.5% <span class="text-gray-dark ml-1">较上月</span></p></div><div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary"><i class="fa fa-users text-xl"></i></div></div></div>
           <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100"><div class="flex items-start justify-between"><div><p class="text-gray-dark text-sm mb-1">活跃用户</p><h3 class="text-3xl font-bold mb-2">6,521</h3><p class="text-success text-sm flex items-center"><i class="fa fa-arrow-up mr-1"></i> 8.3% <span class="text-gray-dark ml-1">较上月</span></p></div><div class="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center text-success"><i class="fa fa-user-circle text-xl"></i></div></div></div>
         </div>
+=======
+      
+      <!-- 用户管理页面 -->
+      <div class="page hidden" id="user-management-page">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+          <div><h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold">用户管理</h2><p id="text-gray-dark">管理系统所有用户账户和权限</p></div>
+          <div class="flex gap-3">
+            <div class="relative"><input type="text" placeholder="搜索用户..." class="pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary w-full md:w-64"><i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-dark"></i></div>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-6 mb-6">
+          <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-gray-dark text-sm mb-1">总用户</p>
+                <h3 class="text-3xl font-bold mb-2" id="total-users-count"></h3>
+                <p class="text-success text-sm flex items-center"></p>
+              </div>
+              <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                <i class="fa fa-users text-xl"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+>>>>>>> origin/wmk
         
         <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100 mb-6">
           <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
             <div class="flex flex-wrap gap-2">
               <button class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">全部用户</button>
+<<<<<<< HEAD
               <button class="px-3 py-1 bg-gray-light text-gray-dark rounded-full text-sm hover:bg-gray-200">大一学生</button>
               <button class="px-3 py-1 bg-gray-light text-gray-dark rounded-full text-sm hover:bg-gray-200">大二学生</button>
               <button class="px-3 py-1 bg-gray-light text-gray-dark rounded-full text-sm hover:bg-gray-200">大三学生</button>
               <button class="px-3 py-1 bg-gray-light text-gray-dark rounded-full text-sm hover:bg-gray-200">大四学生</button>
               <button class="px-3 py-1 bg-gray-light text-gray-dark rounded-full text-sm hover:bg-gray-200">教师</button>
+=======
+>>>>>>> origin/wmk
             </div>
           </div>
           
           <div class="overflow-x-auto">
             <table class="w-full">
               <thead><tr class="border-b border-gray-200">
+<<<<<<< HEAD
                 <th class="text-left py-3 px-4 font-medium text-gray-dark w-10"><input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary"></th>
                 <th class="text-left py-3 px-4 font-medium text-gray-dark">用户信息</th>
                 <th class="text-left py-3 px-4 font-medium text-gray-dark">邮箱</th>
@@ -297,21 +455,37 @@
                     <button class="text-gray-dark hover:text-danger">删除</button>
                   </td>
                 </tr>
+=======
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">用户名</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">学院</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">年级</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">角色</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">操作</th>
+              </tr></thead>
+              <tbody id="user-list">
+>>>>>>> origin/wmk
               </tbody>
             </table>
           </div>
           
           <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+<<<<<<< HEAD
             <div class="text-sm text-gray-dark">显示 1-5 条，共 12,847 条记录</div>
+=======
+            <div class="text-sm text-gray-dark">显示 1-5 条，共  条记录</div>
+>>>>>>> origin/wmk
             <div class="flex gap-2">
               <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-dark hover:bg-gray-light disabled:opacity-50" disabled>
                 <i class="fa fa-angle-left"></i>
               </button>
               <button class="w-9 h-9 flex items-center justify-center rounded bg-primary text-white">1</button>
               <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-light">2</button>
+<<<<<<< HEAD
               <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-light">3</button>
               <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-light">...</button>
               <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-light">2570</button>
+=======
+>>>>>>> origin/wmk
               <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-dark hover:bg-gray-light">
                 <i class="fa fa-angle-right"></i>
               </button>
@@ -326,6 +500,7 @@
           <div><h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold">内容管理</h2><p class="text-gray-dark">管理系统中学生的提问内容</p></div>
           <div class="flex gap-3">
             <div class="relative"><input type="text" placeholder="搜索提问..." class="pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary w-full md:w-64"><i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-dark"></i></div>
+<<<<<<< HEAD
             <button class="btn btn-primary"><i class="fa fa-plus"></i><span>发布公告</span></button>
           </div>
         </div>
@@ -350,18 +525,42 @@
             </div>
           </div>
         </div>
+=======
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-6 mb-6">
+          <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-gray-dark text-sm mb-1">总提问数</p>
+                <h3 class="text-3xl font-bold mb-2" id="total-questions-count"></h3>
+                <p class="text-success text-sm flex items-center"></p>
+              </div>
+              <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                <i class="fa fa-question-circle text-xl"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+>>>>>>> origin/wmk
         
         <div class="card bg-white shadow-sm rounded-xl p-5 border border-gray-100 mb-6">
           <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
             <div class="flex flex-wrap gap-2">
               <button class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">全部提问</button>
+<<<<<<< HEAD
               <button class="px-3 py-1 bg-gray-light text-gray-dark rounded-full text-sm hover:bg-gray-200">已回答</button>
               <button class="px-3 py-1 bg-gray-light text-gray-dark rounded-full text-sm hover:bg-gray-200">未回答</button>
               <button class="px-3 py-1 bg-gray-light text-gray-dark rounded-full text-sm hover:bg-gray-200">本周新增</button>
+=======
+>>>>>>> origin/wmk
             </div>
           </div>
           
           <div class="overflow-x-auto">
+<<<<<<< HEAD
             <table class="w-full">
               <thead><tr class="border-b border-gray-200">
                 <th class="text-left py-3 px-4 font-medium text-gray-dark w-10"><input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary"></th>
@@ -472,21 +671,39 @@
                     <button class="text-gray-dark hover:text-danger">删除</button>
                   </td>
                 </tr>
+=======
+            <table class="w-full min-w-max">
+              <thead><tr class="border-b border-gray-200">
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">学生提问</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">提问学生</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">提问时间</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-dark">操作</th>
+              </tr></thead>
+              <tbody id="content-list">
+                
+>>>>>>> origin/wmk
               </tbody>
             </table>
           </div>
           
           <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+<<<<<<< HEAD
             <div class="text-sm text-gray-dark">显示 1-5 条，共 42,195 条记录</div>
+=======
+            <div class="text-sm text-gray-dark">显示 1-3 条，共 6 条记录</div>
+>>>>>>> origin/wmk
             <div class="flex gap-2">
               <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-dark hover:bg-gray-light disabled:opacity-50" disabled>
                 <i class="fa fa-angle-left"></i>
               </button>
               <button class="w-9 h-9 flex items-center justify-center rounded bg-primary text-white">1</button>
               <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-light">2</button>
+<<<<<<< HEAD
               <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-light">3</button>
               <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-light">...</button>
               <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:bg-gray-light">8440</button>
+=======
+>>>>>>> origin/wmk
               <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-dark hover:bg-gray-light">
                 <i class="fa fa-angle-right"></i>
               </button>
@@ -494,6 +711,7 @@
           </div>
         </div>
       </div>
+<<<<<<< HEAD
 
       <!-- 系统设置页面：保持不变 -->
       <div class="page hidden" id="system-settings-page">
@@ -641,6 +859,28 @@
         </div>
       </div>
     </div>
+=======
+    
+    </div>
+
+     <!-- 帖子详情弹窗 -->
+    <div id="post-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-xl shadow-lg max-w-md w-full mx-4 p-6">
+        <div class="flex justify-between items-start mb-4">
+          <h3 id="modal-title" class="text-xl font-bold text-gray-dark"></h3>
+          <button onclick="document.getElementById('post-modal').classList.add('hidden')" class="text-gray-dark hover:text-danger text-xl">×</button>
+        </div>
+        <div class="mb-4">
+          <span id="modal-tag" class="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm"></span>
+        </div>
+        <div id="modal-content" class="text-gray-dark leading-relaxed whitespace-pre-line"></div>
+        <div class="mt-6 flex justify-end">
+          <button onclick="document.getElementById('post-modal').classList.add('hidden')" class="btn btn-outline">关闭</button>
+        </div>
+      </div>
+    </div>
+
+>>>>>>> origin/wmk
   </main>
 
   <!-- 引入自定义JS -->
@@ -650,6 +890,7 @@
 
   <!-- 图表初始化：新增内容分类柱形图，调整布局适配 -->
   <script>
+<<<<<<< HEAD
     document.addEventListener('DOMContentLoaded', function() {
       if (typeof initCharts === 'function') {
         initCharts = function() {
@@ -791,3 +1032,9 @@
   </script>
 </body>
 </html>
+=======
+  
+  </script>
+</body>
+</html>
+>>>>>>> origin/wmk
