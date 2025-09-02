@@ -45,11 +45,17 @@ public class PostService {
     }
 
     // 获取所有帖子
-    @Transactional(readOnly = true)
+    /*@Transactional(readOnly = true)
     public List<PostDetailDTO> getAllPosts(Long currentUserId) {
         List<Post> posts = postRepository.findAll();
         return convertToDTOs(posts, currentUserId);
+    }*/
+    @Transactional(readOnly = true)
+    public List<PostDetailDTO> getAllPosts(Long currentUserId) {
+        List<Post> posts = postRepository.findByOrderByCreatedAtDesc();
+        return convertToDTOs(posts, currentUserId);
     }
+
 
     // 获取某用户发布的所有帖子
     @Transactional(readOnly = true)
@@ -193,4 +199,19 @@ public class PostService {
             throw new RuntimeException("删除帖子失败: " + e.getMessage());
         }
     }
+
+    // 在 PostService.java 中添加以下方法
+    /**
+     * 获取热门帖子（按点赞数排序）
+     * @param currentUserId 当前用户ID
+     * @return 热门帖子列表
+     */
+    @Transactional(readOnly = true)
+    public List<PostDetailDTO> getHotPosts(Long currentUserId) {
+        List<Post> posts = postRepository.findByOrderByLikeCountDesc();
+        return convertToDTOs(posts, currentUserId);
+    }
+
+
+
 }

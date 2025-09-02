@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin(
@@ -418,8 +417,4 @@ public class AdminController {
             throw new RuntimeException("加密失败", e);
         }
     }
-
-
-
-
 }

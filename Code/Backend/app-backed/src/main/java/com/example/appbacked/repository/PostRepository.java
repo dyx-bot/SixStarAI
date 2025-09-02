@@ -15,6 +15,11 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findByUserId(Long userId);
+    List<Post> findByOrderByLikeCountDesc();
+
+    // 在 PostRepository.java 中添加以下方法
+    List<Post> findByOrderByCreatedAtDesc();
+
     Long countByUserId(Long userId);
 
     // 添加根据帖子ID删除的方法

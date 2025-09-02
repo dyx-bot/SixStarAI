@@ -133,6 +133,32 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
+    // 在 PostController.java 中添加以下方法
+    /**
+     * 获取热门帖子（按点赞数排序）
+     * @param userId 当前用户ID（用于判断是否点赞/收藏）
+     * @return 热门帖子列表
+     */
+    @GetMapping("/hot")
+    public ResponseEntity<?> getHotPosts(@RequestParam Long userId) {
+        // 验证用户是否存在
+        if (!userRepository.existsById(userId)) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "用户不存在");
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            List<PostDetailDTO> hotPosts = postService.getHotPosts(userId);
+            return ResponseEntity.ok(hotPosts);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "获取热门帖子失败: " + e.getMessage());
+            return ResponseEntity.status(500).body(error);
+        }
+    }
+
+
     // 获取指定用户收藏的所有帖子
     @GetMapping("/favorite/{userId}")
     public ResponseEntity<?> getFavoritePostsByUserId(@PathVariable Long userId,
