@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-// 主逻辑：初始化、全局事件、工具函数
-document.addEventListener('DOMContentLoaded', function() {
-  // 页面初始化提示
-  console.log('管理员后台初始化完成 ✅');
-
-=======
 const BASE =`http://10.10.24.99:8080`
 
 // 主逻辑：初始化、全局事件、工具函数
@@ -18,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // 显示对应的页面
   showPage(targetId);
   
->>>>>>> origin/wmk
   // 全局事件：ESC键关闭侧边栏（移动设备）
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape' && window.innerWidth < 1024) {
@@ -46,9 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
       alert(`[${type.toUpperCase()}] ${message}`); // 简单实现，后续可替换为弹窗组件
     }
   };
-<<<<<<< HEAD
-});
-=======
 
   // 获取内容搜索框并绑定事件
   const searchInput = document.querySelector('#content-management-page input[placeholder="搜索提问..."]');
@@ -575,4 +564,3 @@ function searchUsers(keyword) {
   
   userList.innerHTML = rows.join('');
 }
->>>>>>> origin/wmk
