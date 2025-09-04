@@ -46,6 +46,21 @@ public class Post {
     @Column(name = "reply_count")
     private Integer replyCount = 0;
 
+    @Column(name = "image_urls", columnDefinition = "TEXT")
+    private String imageUrls;
+
+
+
+    // 添加 getter 和 setter
+    public String getImageUrls() {
+        return imageUrls;
+    }
+
+    public void setImageUrls(String imageUrls) {
+        this.imageUrls = imageUrls;
+    }
+
+
     public Integer getLikeCount() {
         return likeCount;
     }
@@ -67,62 +82,21 @@ public class Post {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    // 在 Post.java 中添加以下字段和方法
+    @Column(name = "report_count", nullable = false)
+    private Integer reportCount = 0;
+
+    // 添加 getter 和 setter 方法
+    public Integer getReportCount() {
+        return reportCount;
+    }
+
+    public void setReportCount(Integer reportCount) {
+        this.reportCount = reportCount;
+    }
+
+
 }
 
 
-
-/*
-// com.example.campusservice.entity.Post
-package com.example.appbacked.entity;
-
-import jakarta.persistence.*;
-import lombok.Data;
-
-import java.time.LocalDateTime;
-
-@Data
-@Entity
-@Table(name = "posts")
-public class Post {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
-    @Column(name = "title", nullable = false)
-    private String title;
-
-    @Column(name = "content", nullable = false)
-    private String content;
-
-    @Column(name = "is_hide_college")
-    private Boolean isHideCollege = false;
-
-    @Column(name = "is_hide_grade")
-    private Boolean isHideGrade = false;
-
-    @Column(name = "tag")
-    private String tag;
-
-    @Column(name = "grade", length = 20)
-    private String grade;
-
-    @Column(name = "college", length = 50)
-    private String college;
-
-    @Column(name = "like_count")
-    private Integer likeCount = 0;
-
-    @Column(name = "reply_count")
-    private Integer replyCount = 0;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-}
-*/

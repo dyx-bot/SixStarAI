@@ -17,6 +17,11 @@ import java.util.List;
 import java.util.Map;
 import jakarta.validation.Valid;
 
+// 在 PostController.java 文件顶部添加导入
+import com.example.appbacked.entity.Report;
+import com.example.appbacked.repository.ReportRepository;
+
+
 @RestController
 @RequestMapping("/api/posts")
 public class PostController {
@@ -212,5 +217,55 @@ public class PostController {
             return ResponseEntity.status(500).body(error);
         }
     }
+
+
+    // 在类中添加 ReportRepository 注入
+    @Autowired
+    private ReportRepository reportRepository;
+
+    // 替换原有的 reportPost 方法
+    @PostMapping("/{postId}/report")
+    public ResponseEntity<?> reportPost(@PathVariable Long postId, @RequestParam Long userId) {
+        try {
+            // 验证用户是否存在
+            if (!userRepository.existsById(userId)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            // 验证帖子是否存在
+            Post post = postRepository.findById(postId).orElse(null);
+            if (post == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            // 检查用户是否已经举报过该帖子
+            if (reportRepository.existsByPostIdAndUserId(postId, userId)) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("success", false, "message", "您已举报过此帖子"));
+            }
+
+            // 创建举报记录
+            Report report = new Report(postId, userId, "无理由举报");
+            reportRepository.save(report);
+
+            // 增加举报数量
+            int currentReportCount = post.getReportCount() != null ? post.getReportCount() : 0;
+            post.setReportCount(currentReportCount + 1);
+            postRepository.save(post);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "举报成功");
+            response.put("reportCount", post.getReportCount());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "举报失败: " + e.getMessage());
+            return ResponseEntity.status(500).body(error);
+        }
+    }
+
 }
 

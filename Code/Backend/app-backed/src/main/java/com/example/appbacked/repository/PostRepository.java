@@ -38,5 +38,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // 按时间倒序获取所有帖子（支持分页）
     Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
+    // 在 PostRepository.java 中添加以下方法
+    Page<Post> findByReportCountGreaterThan(int reportCount, Pageable pageable);
+
+    // 添加到 PostRepository 接口中
+    Page<Post> findByReportCountGreaterThanOrderByReportCountDesc(int reportCount, Pageable pageable);
+
 
 }

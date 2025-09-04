@@ -5,6 +5,7 @@ import com.example.appbacked.dto.PostDetailDTO;
 import com.example.appbacked.entity.Post;
 import com.example.appbacked.entity.User;
 import com.example.appbacked.repository.PostRepository;
+import com.example.appbacked.repository.ReportRepository;
 import com.example.appbacked.repository.UserRepository;
 import com.example.appbacked.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
 
 @RestController
 @RequestMapping("/api/admin")
@@ -242,6 +244,9 @@ public class AdminController {
                 dto.setIsHideGrade(post.getIsHideGrade());
                 dto.setLikeCount(post.getLikeCount() != null ? post.getLikeCount() : 0);
                 dto.setReplyCount(post.getReplyCount() != null ? post.getReplyCount() : 0);
+                // 添加举报数处理，确保不为null
+                dto.setReportCount(post.getReportCount() != null ? post.getReportCount() : 0);
+
 
                 // 使用 DateTimeFormatter 格式化 LocalDateTime
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -321,7 +326,7 @@ public class AdminController {
             response.put("success", true);
             response.put("data", userPage.getContent());
             response.put("currentPage", userPage.getNumber());
-            response.put("totalItems", userPage.getTotalElements());
+            response.put("userItems", userPage.getTotalElements());
             response.put("totalPages", userPage.getTotalPages());
             response.put("pageSize", userPage.getSize());
 
@@ -415,6 +420,82 @@ public class AdminController {
             return hexString.toString();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("加密失败", e);
+        }
+    }
+
+    // 在类中添加 ReportRepository 注入
+    @Autowired
+    private ReportRepository reportRepository;
+
+
+// 在 AdminController.java 中添加以下方法
+    /**
+     * 获取被举报的帖子列表（按举报数量排序）
+     * @param page 页码（从0开始）
+     * @param size 每页大小
+     */
+    @GetMapping("/reported-posts")
+    public ResponseEntity<?> getReportedPosts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        try {
+            // 创建分页请求，按举报数量倒序排列
+            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "reportCount"));
+
+            // 获取举报数量大于0的帖子
+            // 修改 getReportedPosts 方法中的这一行
+            Page<Post> postPage = postRepository.findByReportCountGreaterThanOrderByReportCountDesc(0, pageable);
+
+            // 转换为 PostDetailDTO
+            List<PostDetailDTO> postDTOs = postPage.getContent().stream().map(post -> {
+                PostDetailDTO dto = new PostDetailDTO();
+                dto.setId(post.getId());
+                dto.setTitle(post.getTitle());
+                dto.setContent(post.getContent());
+                dto.setTag(post.getTag());
+                dto.setIsHideCollege(post.getIsHideCollege());
+                dto.setIsHideGrade(post.getIsHideGrade());
+                dto.setLikeCount(post.getLikeCount() != null ? post.getLikeCount() : 0);
+                dto.setReplyCount(post.getReplyCount() != null ? post.getReplyCount() : 0);
+                dto.setReportCount(post.getReportCount() != null ? post.getReportCount() : 0); // 添加举报数量
+
+                // 使用 DateTimeFormatter 格式化 LocalDateTime
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                dto.setCreatedAt(post.getCreatedAt().format(formatter));
+                // 获取用户信息
+                User user = userRepository.findById(post.getUserId()).orElse(null);
+                if (user != null) {
+                    dto.setUsername(user.getUsername());
+                    dto.setAvatar(user.getAvatar());
+                    dto.setGrade(user.getGrade());
+                    dto.setCollege(user.getCollege());
+                } else {
+                    dto.setUsername("未知用户");
+                    dto.setAvatar(null);
+                    dto.setGrade(null);
+                    dto.setCollege(null);
+                }
+
+                // 管理员界面不需要这些字段
+                dto.setIsLiked(false);
+                dto.setIsFavorited(false);
+
+                return dto;
+            }).collect(Collectors.toList());
+
+            // 构建响应数据
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", postDTOs);
+            response.put("currentPage", postPage.getNumber());
+            response.put("reportItems", postPage.getTotalElements());
+            response.put("totalPages", postPage.getTotalPages());
+            response.put("pageSize", postPage.getSize());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(Map.of("success", false, "message", "获取举报帖子列表失败: " + e.getMessage()));
         }
     }
 }

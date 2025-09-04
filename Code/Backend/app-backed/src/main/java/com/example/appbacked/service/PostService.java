@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Arrays;
 
 @Service
 public class PostService {
@@ -45,17 +46,11 @@ public class PostService {
     }
 
     // 获取所有帖子
-    /*@Transactional(readOnly = true)
-    public List<PostDetailDTO> getAllPosts(Long currentUserId) {
-        List<Post> posts = postRepository.findAll();
-        return convertToDTOs(posts, currentUserId);
-    }*/
     @Transactional(readOnly = true)
     public List<PostDetailDTO> getAllPosts(Long currentUserId) {
         List<Post> posts = postRepository.findByOrderByCreatedAtDesc();
         return convertToDTOs(posts, currentUserId);
     }
-
 
     // 获取某用户发布的所有帖子
     @Transactional(readOnly = true)
@@ -120,8 +115,16 @@ public class PostService {
             // 使用数据库中存储的计数
             dto.setLikeCount(post.getLikeCount());
             dto.setReplyCount(post.getReplyCount());
+            dto.setPreportCount(post.getReportCount()); // 修改后
             dto.setIsLiked(isLiked);
             dto.setIsFavorited(isFavorited);
+
+            // 添加图片URL
+            if (post.getImageUrls() != null && !post.getImageUrls().isEmpty()) {
+                // 假设图片URL是以逗号分隔的字符串
+                dto.setImageUrls(Arrays.asList(post.getImageUrls().split(",")));
+            }
+
             dto.setCreatedAt(post.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
             return dto;
         }).collect(Collectors.toList());
@@ -200,7 +203,6 @@ public class PostService {
         }
     }
 
-    // 在 PostService.java 中添加以下方法
     /**
      * 获取热门帖子（按点赞数排序）
      * @param currentUserId 当前用户ID
@@ -211,7 +213,4 @@ public class PostService {
         List<Post> posts = postRepository.findByOrderByLikeCountDesc();
         return convertToDTOs(posts, currentUserId);
     }
-
-
-
 }
