@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { getAuth } from "../auth/storage";
 import { BASE } from "../lib/api";
-import { ElMessage } from "element-plus";
+import { message } from "antd";
 
 function makeAutoTitle(content, tag) {
   const base = (content || "").trim().replace(/\s+/g, " ");
@@ -74,7 +74,7 @@ export default function Post() {
       }
 
       if (res.ok) {
-        ElMessage.success("发布成功！");
+        message.success("发布成功！");
         setForm({
           content: "",
           tag: "",

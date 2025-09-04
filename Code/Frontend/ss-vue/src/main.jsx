@@ -10,7 +10,6 @@ import Login from "./pages/Login.jsx";
 import Chat from "./pages/Chat.jsx";
 import Discussion from "./pages/Discussion.jsx";
 import Profile from "./pages/Profile.jsx";
-import 'element-plus/dist/index.css';
 import Setting from "./pages/Setting.jsx";
 import Post from "./pages/Post.jsx";
 import PostDetail from "./pages/PostDerails.jsx";

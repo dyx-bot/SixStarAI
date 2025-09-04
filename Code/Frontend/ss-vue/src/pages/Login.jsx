@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "./Login.css";
 import { loginApi } from "../lib/api"; // 引入优化后的api（已自动处理JSON序列化）
 import { saveAuth } from "../auth/storage";
-import { ElMessage } from 'element-plus';
+import { message } from 'antd';
 
 export default function Login() {
  
@@ -48,7 +48,7 @@ export default function Login() {
           grade: data.grade, 
           token: data.token
         });
-        ElMessage.success('登录成功！');
+        message.success('登录成功！');
         console.log("Navigating to /");
 
         navigate("/app"); // 登录成功跳转到首页路由

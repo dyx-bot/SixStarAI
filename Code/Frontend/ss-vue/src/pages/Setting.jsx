@@ -3,7 +3,7 @@ import { getAuth } from "../auth/storage";
 import { uploadAvatarApi } from "../lib/api";
 import "./Setting.css";
 import {BASE} from "../lib/api"
-import { ElMessage } from 'element-plus';
+import { message } from 'antd';
 export default function Setting() {
   // ✅ 直接从 getAuth() 中解构字段
   const { id, username, avatar, college, grade } = getAuth();
@@ -102,14 +102,14 @@ const handleUsernameSave = async() => {
     });
     const data = await res.json();
     if (data.success) {
-      ElMessage.success("用户名已修改为：" + usernameText);
+      message.success("用户名已修改为：" + usernameText);
       // 同步到localStorage
       localStorage.setItem("auth_user_name", usernameText);
     } else {
-      ElMessage.error("修改失败：" + (data.message || "未知错误"));
+      message.error("修改失败：" + (data.message || "未知错误"));
     }
   } catch (err) {
-    ElMessage.error("修改失败：" + err.message);
+    message.error("修改失败：" + err.message);
   }
 };
 
