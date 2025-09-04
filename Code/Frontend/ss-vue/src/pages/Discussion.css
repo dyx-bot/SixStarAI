@@ -111,12 +111,26 @@
   border:1px solid #d8efe5; background:#edf7f3;
   color:#2a6a55; font-weight:800;
   transition:all .15s ease;
+  flex-shrink: 0;  
 }
 .lx-tab.on{
   border:none; color:#fff;
   background:linear-gradient(180deg,#7ee2b6,#22a06e);
   box-shadow:0 8px 18px rgba(34,160,110,.18);
 }
+
+.tab-bar {
+  display: flex;
+  gap: 8px;                /* 按钮之间的间距 */
+  overflow-x: auto;        /* 横向滚动 */
+  white-space: nowrap;     /* 防止自动换行 */
+  padding: 8px 0;
+}
+
+.tab-bar::-webkit-scrollbar {
+  display: none;           /* 隐藏滚动条，可选 */
+}
+
 
 /* ===== 帖子卡片（圆角、柔阴影） ===== */
 .lx-feed-card.lx-compact{
@@ -220,7 +234,7 @@
 .lx-post-detail-replies h3{ margin:0 0 8px; color:#184a38; border-bottom:1px solid #e6f5ee; padding-bottom:6px; }
 .lx-reply{ padding:12px 0; border-bottom:1px solid #f0f4f1; }
 .lx-reply:last-child{ border-bottom:none; }
-.lx-reply-header{ display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+.lx-reply-header{ display:flex; align-items:center; gap:6px; margin-bottom:4px; }
 .lx-reply-info{ flex:1; }
 .lx-reply-author{ font-weight:700; color:#184a38; font-size:14px; }
 .lx-reply-time{ font-size:12px; color:#6a8f82; }
@@ -385,3 +399,437 @@
 }
 .lx-time{ font-size: 12px; }
 
+/* === 只做三处微调，不改整体布局尺寸 === */
+
+/* 1) 时间移动到卡片右下角（不改变卡片排布与高度） */
+.lx-feed-card { position: relative; }  /* 仅添加定位上下文 */
+.lx-time,
+.lx-feed-card .lx-reply-time {         /* 兼容你项目里可能用的两种类名 */
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  font-size: 12px;            /* 与你原来的字号一致 */
+  color: #7aa896;
+  white-space: nowrap;
+  pointer-events: none;       /* 防止遮挡点击 */
+}
+
+/* 2) 点赞/评论“标识”视觉放大一点，但不影响布局计算（用 transform 放大） */
+.lx-feed-actions .lx-act {
+  transform: scale(1.15);          /* 仅视觉放大，不占更多布局空间 */
+  transform-origin: left center;   /* 从左侧放大，不顶挤其它元素 */
+  will-change: transform;
+}
+
+/* 3) 收藏按钮更小更扁（只压缩按钮自身，不影响其它布局） */
+.lx-follow {
+  padding: 4px 10px;    /* 更扁更紧凑 */
+  font-size: 12px;      /* 稍小，但仍清晰 */
+  line-height: 1;
+}
+.lx-follow.on {
+  padding: 4px 10px;    /* 选中态也保持扁 */
+  font-size: 12px;
+}
+
+/* 原帖卡片 */
+.lx-original-post {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* 让正文更明显 */
+.lx-original-post .lx-post-content {
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* 通用卡片外观（阴影+圆角，适配图二风格） */
+.lx-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  padding: 14px;
+}
+.lx-card + .lx-card { margin-top: 12px; }
+
+/* 骨架（加载占位） */
+.skeleton {
+  height: 120px;
+  background: linear-gradient(90deg, #f2f2f2 0%, #fafafa 50%, #f2f2f2 100%);
+  background-size: 200% 100%;
+  animation: sk 1.3s infinite linear;
+}
+@keyframes sk { to { background-position: -200% 0; } }
+
+/* 顶部原帖卡片 */
+.lx-original-post-card { margin-bottom: 14px; }
+
+/* 头部：头像、昵称、时间、更多按钮 */
+.lx-op-header,
+.lx-reply-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.lx-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: #e8f3ed; color: #2f855a;
+  display: inline-flex; align-items: center; justify-content: center;
+  overflow: hidden; flex: 0 0 40px;
+}
+.lx-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.lx-op-meta { display: flex; flex-direction: column; gap: 2px; }
+.lx-name { font-weight: 700; color: #1b4332; }
+.lx-time { font-size: 12px; color: #6b7280; }
+
+.lx-dots-btn {
+  margin-left: auto;
+  background: transparent; border: none; cursor: pointer;
+  font-size: 22px; line-height: 1; color: #7a7a7a;
+}
+
+/* 原帖正文/回复正文 */
+.lx-op-content,
+.lx-reply-content {
+  margin-top: 10px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #2f2f2f;
+  white-space: pre-wrap;        /* 多行换行 */
+  word-break: break-word;
+}
+
+/* 原帖底部操作区（点赞/评论/分享） */
+.lx-op-actions {
+  display: flex; align-items: center; gap: 20px;
+  padding-top: 10px; margin-top: 8px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  color: #436b5d;
+}
+.lx-op-action { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; }
+
+/* 分区标题：‘回复（N）’ */
+.lx-block-title {
+  margin: 6px 4px 10px;
+  font-size: 16px; font-weight: 800; color: #1b4332;
+}
+
+/* 单条回复卡片 */
+.lx-reply {  padding: 8px 12px;      /* 原来 12px 14px → 更紧凑 */
+  margin-bottom: 8px;     /* 可以加这一行控制间距 */
+  border-bottom: 1px solid #f0f4f1; /* 保持分隔线 */ }
+.lx-reply + .lx-reply { margin-top: 10px; }
+.lx-reply-info { display: flex; flex-direction: column; }
+.lx-reply-author { font-weight: 700; color: #1b4332; }
+.lx-reply-time { font-size: 12px; color: #6b7280; }
+
+/* 回复输入框样式，做成卡片 */
+.lx-reply-form { margin-top: 14px; }
+.lx-reply-form textarea {
+  width: 100%; resize: vertical; min-height: 90px;
+  padding: 10px 12px; border: 1px solid #e5efe9; border-radius: 10px;
+  outline: none; font-size: 14px;
+}
+.lx-reply-form .lx-btn {
+  margin-top: 12px; width: 100%;
+  background: linear-gradient(180deg,#6fd19a,#2e8b57);
+  color: #fff; border: none; border-radius: 999px;
+  padding: 12px 16px; font-weight: 700; cursor: pointer;
+}
+.lx-reply-form .lx-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
+
+/* 空状态 */
+.lx-empty { text-align: center; color: #6b7280; }
+
+
+
+
+/* 帖子详情主体：上下布局 */
+.lx-post-detail-body {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 100px); /* 页面高度减去 header */
+  gap: 12px;
+  align-items: center;
+}
+
+/* 评论区标题 */
+.lx-block-title {
+  margin: 8px 0;
+  font-weight: bold;
+  width: 95%;
+  max-width: 800px;
+}
+
+/* 原帖、评论卡片、回复输入框保持相同宽度 */
+.lx-original-post-card,
+.lx-reply,
+.lx-reply-form {
+  width: 95%;
+  max-width: 800px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* 原帖：自适应内容高度，不要滚动条 */
+.lx-original-post-card {
+  flex: 0 0 auto;    /* 高度由内容决定，不再固定 */
+  min-height: unset; /* 移除最小高度限制 */
+  max-height: none;  /* 移除最大高度 */
+  overflow: visible; /* 显示完整内容 */
+}
+
+
+/* 评论区：占据中间剩余空间，可滚动 */
+.lx-replies-list {
+  flex: 1;             /* 占据剩余空间 */
+  overflow-y: auto;
+  margin-bottom: 12px;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  scrollbar-gutter: stable overlay;
+}
+
+/* 回复输入框：固定高度 */
+.lx-reply-form {
+  flex: 0 0 20%;      /* 占 20% 高度 */
+  min-height: 100px;  /* 至少 100px */
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+/* 回复输入框里的 textarea */
+.lx-reply-form textarea {
+  flex: 1;
+  resize: vertical;
+  min-height: 40px;
+}
+
+/* 美化滚动条 */
+.lx-replies-list::-webkit-scrollbar {
+  width: 6px;
+}
+.lx-replies-list::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+.lx-replies-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+
+
+
+
+.lx-reply-actions {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}
+
+.lx-reply-like.liked {
+  color: #1890ff; /* 已点赞时高亮 */
+}
+
+
+
+
+
+
+
+/* ==== 评论区瘦身补丁 ==== */
+
+/* 整个评论卡片更紧凑 */
+.lx-reply {
+  padding: 8px 10px;         /* 原来 12px 14px → 缩小内边距 */
+  margin-bottom: 6px;        /* 缩小评论之间的间距 */
+}
+
+/* 头像缩小到 28px */
+.lx-reply .lx-avatar {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  font-size: 14px;           /* emoji/文字头像也跟着缩小 */
+}
+
+/* 头像里的图片跟随容器 */
+.lx-reply .lx-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* 头部信息紧凑 */
+.lx-reply-header {
+  gap: 6px;                  /* 原来 12px → 缩小间距 */
+  margin-bottom: 4px;        /* 原来 8px → 更紧凑 */
+}
+.lx-reply-author {
+  font-size: 13px;           /* 原来 14px */
+}
+.lx-reply-time {
+  font-size: 11px;           /* 原来 12px */
+}
+
+/* 评论正文更紧凑 */
+.lx-reply-content {
+  font-size: 13px;           /* 原来 15px */
+  line-height: 1.4;          /* 原来 1.7 */
+  margin: 4px 0;             /* 原来 8px → 缩小上下间距 */
+}
+
+/* 点赞/操作按钮更小 */
+.lx-reply-actions {
+  margin-top: 4px;           /* 原来 8px */
+  font-size: 12px;           /* 原来 14px */
+  gap: 10px;                 /* 原来 16px */
+}
+
+
+
+
+.lx-tag-bar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 0;
+  scrollbar-width: none;   /* Firefox */
+}
+
+.lx-tag-bar::-webkit-scrollbar {
+  display: none;           /* Chrome/Safari 隐藏滚动条 */
+}
+
+.lx-tag {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid #d8efe5;
+  background: #edf7f3;
+  color: #2a6a55;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+.lx-tag.on {
+  border: none;
+  color: #fff;
+  background: linear-gradient(180deg,#7ee2b6,#22a06e);
+  box-shadow: 0 8px 18px rgba(34,160,110,.18);
+}
+
+
+
+
+
+
+/* 整个 Tabs + 标签容器 */
+.lx-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 0;
+  scrollbar-width: none;   /* Firefox 隐藏滚动条 */
+}
+.lx-tabs::-webkit-scrollbar {
+  display: none;           /* Chrome/Safari 隐藏滚动条 */
+}
+
+/* 全部 / 热门 */
+.lx-tab {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #d8efe5;
+  background: #edf7f3;
+  color: #2a6a55;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.lx-tab.on {
+  border: none;
+  color: #fff;
+  background: linear-gradient(180deg,#7ee2b6,#22a06e);
+  box-shadow: 0 8px 18px rgba(34,160,110,.18);
+}
+
+/* 标签样式（与 lx-tab 保持统一风格） */
+.lx-tag {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #d8efe5;
+  background: #edf7f3;
+  color: #2a6a55;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.lx-tag.on {
+  border: none;
+  color: #fff;
+  background: linear-gradient(180deg,#7ee2b6,#22a06e);
+  box-shadow: 0 8px 18px rgba(34,160,110,.18);
+}
+
+
+
+/* Tabs + 标签容器 */
+.lx-tabs {
+  display: flex;
+  flex-wrap: nowrap;     /* 强制不换行 */
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 0;
+  scrollbar-width: none;   /* Firefox */
+  -webkit-overflow-scrolling: touch; /* 提高滑动流畅度 */
+}
+.lx-tabs::-webkit-scrollbar {
+  display: none;           /* Chrome/Safari 隐藏滚动条 */
+}
+
+/* 所有按钮（全部 / 热门 / 标签）统一样式 */
+.lx-tab,
+.lx-tag {
+  flex-shrink: 0;
+  width: 90px;             /* 固定宽度，保证一样大，可以改成 100px 看效果 */
+  text-align: center;
+  padding: 6px 0;
+  border-radius: 999px;
+  border: 1px solid #d8efe5;
+  background: #edf7f3;
+  color: #2a6a55;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+/* 激活状态 */
+.lx-tab.on,
+.lx-tag.on {
+  border: none;
+  color: #fff;
+  background: linear-gradient(180deg,#7ee2b6,#22a06e);
+  box-shadow: 0 8px 18px rgba(34,160,110,.18);
+}

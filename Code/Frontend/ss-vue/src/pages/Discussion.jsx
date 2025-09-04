@@ -4,13 +4,12 @@ import "./Discussion.css";
 import { getAuth } from "../auth/storage";
 import { BASE } from "../lib/api";
 import { useNavigate } from "react-router-dom";
+import { message, Popconfirm } from "antd";
 
 function hotScore(p) {
-  
-  return (p.likeCount * 1 + p.replyCount * 2) ;
+  return p.likeCount * 1 + p.replyCount * 2;
 }
 
-/* ====== 工具：稳定随机（同一个用户始终同一个头像） ====== */
 function hashStr(s) {
   let h = 0;
   for (let i = 0; i < s.length; i++) {
@@ -20,23 +19,12 @@ function hashStr(s) {
   return Math.abs(h);
 }
 
-/* ====== p2 风格随机头像素材 ====== */
-/** 如果你以后有本地图标图片，放到 public/avatars/p2/ 里，然后把下面数组改成你的路径 */
-const P2_ICONS = [
-  // "/avatars/p2/book.png",
-  // "/avatars/p2/monitor.png",
-  // "/avatars/p2/noodles.png",
-  // "/avatars/p2/camera.png",
-  // ...
-];
-
-/** 现在先用 emoji 来模拟图标风；当 P2_ICONS 有内容时会自动切换为图片 */
+const P2_ICONS = [];
 const P2_EMOJIS = [
   "📚", "🖥️", "🍜", "📷", "🎨", "🌿", "🎧", "💼", "☕", "🍩",
   "🎓", "🔬", "📱", "🧪", "⚽", "🧭", "🍎", "📖"
 ];
 
-/** 选取头像：优先图片，否则 emoji */
 function pickP2Avatar(name = "", id = "") {
   const seed = hashStr(String(id) + String(name));
   if (P2_ICONS.length > 0) {
@@ -45,11 +33,9 @@ function pickP2Avatar(name = "", id = "") {
   return { type: "emoji", value: P2_EMOJIS[seed % P2_EMOJIS.length] };
 }
 
-/* ====== 时间格式（右下角显示） ====== */
 function fmtTime(ts) {
   if (!ts) return "";
   const d = new Date(ts);
-  // 月/日 时:分（24h）
   return d.toLocaleString("zh-CN", {
     month: "numeric",
     day: "numeric",
@@ -59,12 +45,22 @@ function fmtTime(ts) {
   });
 }
 
+const TAGS = [
+  "学习/资料",
+  "生活/吐槽",
+  "表白/情感",
+  "求助/攻略",
+  "组队/组局",
+  "闲置/交易",
+  "寻物/招领",
+];
+
 export default function Discussion() {
   const [kw, setKw] = useState("");
   const [tab, setTab] = useState("all"); // all | hot
+  const [activeTag, setActiveTag] = useState(""); // 当前选择的标签
   const navigate = useNavigate();
 
-  // 示例本地数据兜底
   const demo = useMemo(
     () => [
       {
@@ -77,6 +73,7 @@ export default function Discussion() {
         college: "信息学院",
         grade: "大二",
         isFavorited: true,
+        tag: "学习/资料",
         createdAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
       },
       {
@@ -89,6 +86,7 @@ export default function Discussion() {
         likeCount: 58,
         replyCount: 10,
         isFavorited: false,
+        tag: "求助/攻略",
         createdAt: Date.now() - 1000 * 60 * 60 * 24 * 5,
       },
       {
@@ -101,6 +99,7 @@ export default function Discussion() {
         likeCount: 18,
         replyCount: 5,
         isFavorited: false,
+        tag: "生活/吐槽",
         createdAt: Date.now() - 1000 * 60 * 60 * 24 * 1,
       },
     ],
@@ -127,26 +126,47 @@ export default function Discussion() {
       .catch(() => {});
   }, []);
 
-  const filtered = posts
-    .slice()
-    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
-    .filter(
-      (p) => !kw || p.username?.includes(kw) || p.college?.includes(kw) || p.grade?.includes(kw) || p.content?.includes(kw)
-    );
+const filtered = posts
+  .slice()
+  .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+  .filter(
+    (p) =>
+      !kw ||
+      p.username?.includes(kw) ||
+      p.college?.includes(kw) ||
+      p.grade?.includes(kw) ||
+      p.content?.includes(kw)
+  );
+
 
   const hotSorted = [...posts]
     .sort((a, b) => hotScore(b) - hotScore(a))
     .filter(
-      (p) => !kw || p.username?.includes(kw) || p.college?.includes(kw) || p.grade?.includes(kw) || p.content?.includes(kw)
+      (p) =>
+        !kw ||
+        p.username?.includes(kw) ||
+        p.college?.includes(kw) ||
+        p.grade?.includes(kw) ||
+        p.content?.includes(kw)
     );
 
-  const viewList = tab === "all" ? filtered : hotSorted;
+  let baseList = tab === "all" ? filtered : hotSorted;
+  if (activeTag) {
+    baseList = baseList.filter((p) => p.tag === activeTag);
+  }
+  const viewList = baseList;
 
   const toggleLike = async (id, isliked) => {
     const userId = getAuth().id;
     setPosts((a) =>
       a.map((p) =>
-        p.id === id ? { ...p, isliked: !p.isliked, likeCount: Number(p.likeCount || 0) + (!p.isliked ? 1 : -1) } : p
+        p.id === id
+          ? {
+              ...p,
+              isliked: !p.isliked,
+              likeCount: Number(p.likeCount || 0) + (!p.isliked ? 1 : -1),
+            }
+          : p
       )
     );
     try {
@@ -158,13 +178,23 @@ export default function Discussion() {
       const result = await response.json();
       if (result.likeCount !== undefined && result.likeCount !== null) {
         setPosts((a) =>
-          a.map((p) => (p.id === id ? { ...p, isliked: result.isLiked, likeCount: result.likeCount } : p))
+          a.map((p) =>
+            p.id === id
+              ? { ...p, isliked: result.isLiked, likeCount: result.likeCount }
+              : p
+          )
         );
       }
     } catch {
       setPosts((a) =>
         a.map((p) =>
-          p.id === id ? { ...p, isliked, likeCount: Number(p.likeCount || 0) + (isliked ? 1 : -1) } : p
+          p.id === id
+            ? {
+                ...p,
+                isliked,
+                likeCount: Number(p.likeCount || 0) + (isliked ? 1 : -1),
+              }
+            : p
         )
       );
       alert("点赞失败，请重试");
@@ -194,6 +224,30 @@ export default function Discussion() {
     navigate(`/post/${post.id}`);
   };
 
+  // 举报接口调用
+  const handleReportConfirm = async (postId) => {
+    const userId = getAuth().id;
+    try {
+      const res = await fetch(`${BASE}/api/posts/${postId}/report?userId=${userId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      const result = await res.json();
+      if (result.success) {
+        message.success(result.message || "举报成功");
+      } else {
+        message.error(result.message || "举报失败");
+      }
+    } catch (err) {
+      console.error("举报失败:", err);
+      message.error("举报失败，请稍后重试");
+    }
+  };
+
+  const handleReportCancel = () => {
+    message.info("取消举报");
+  };
+
   return (
     <div className="lx-discussion">
       <div className="lx-shell">
@@ -202,17 +256,47 @@ export default function Discussion() {
         </div>
 
         <div className="lx-search-line">
-          <input value={kw} onChange={(e) => setKw(e.target.value)} placeholder="搜索主题、作者或标签…" />
+          <input
+            value={kw}
+            onChange={(e) => setKw(e.target.value)}
+            placeholder="搜索主题、作者…"
+          />
           <button className="lx-btn">搜索</button>
         </div>
 
-        <div className="lx-tabs">
-          <button className={`lx-tab ${tab === "all" ? "on" : ""}`} onClick={() => setTab("all")}>
+        {/* Tabs + 标签合并 */}
+        <div className="lx-tabs lx-tag-bar">
+          <button
+            className={`lx-tag ${tab === "all" && !activeTag ? "on" : ""}`}
+            onClick={() => {
+              setTab("all");
+              setActiveTag(""); // 清除标签筛选
+            }}
+          >
             全部
           </button>
-          <button className={`lx-tab ${tab === "hot" ? "on" : ""}`} onClick={() => setTab("hot")}>
+          <button
+            className={`lx-tag ${tab === "hot" && !activeTag ? "on" : ""}`}
+            onClick={() => {
+              setTab("hot");
+              setActiveTag(""); // 清除标签筛选
+            }}
+          >
             热门
           </button>
+
+          {TAGS.map((tag) => (
+            <button
+              key={tag}
+              className={`lx-tag ${activeTag === tag ? "on" : ""}`}
+              onClick={() => {
+                setActiveTag(tag);
+                setTab("all"); // 标签筛选使用时间排序
+              }}
+            >
+              {tag}
+            </button>
+          ))}
         </div>
 
         <div className="lx-feed">
@@ -229,7 +313,6 @@ export default function Discussion() {
                   style={{ cursor: "pointer" }}
                 >
                   <div className="lx-feed-hd">
-                    {/* p2 风格随机头像（图片优先，emoji 兜底） */}
                     <div className="lx-avatar p2" aria-hidden>
                       {av.type === "img" ? (
                         <img src={av.value} alt="" />
@@ -257,10 +340,8 @@ export default function Discussion() {
                     </button>
                   </div>
 
-                  {/* 内容更紧凑 */}
                   <div className="lx-feed-content">{p.content}</div>
 
-                  {/* 底部：左侧操作，右侧时间 */}
                   <div className="lx-bottom">
                     <div className="lx-feed-actions">
                       <button
@@ -272,12 +353,39 @@ export default function Discussion() {
                       >
                         👍 <span>{p.likeCount}</span>
                       </button>
-                      <button className="lx-act" onClick={(e) => e.stopPropagation()}>
+
+                      <button
+                        className="lx-act"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/post/${p.id}?focus=comment`);
+                        }}
+                      >
                         💬 <span>{p.replyCount}</span>
                       </button>
-                      <button className="lx-act" onClick={(e) => e.stopPropagation()}>
-                        ⋯
-                      </button>
+
+                      {/* 举报按钮 */}
+                      <Popconfirm
+                        title="举报帖子"
+                        description="确定要举报该帖子吗？"
+                        onConfirm={(e) => {
+                          e?.stopPropagation?.();
+                          handleReportConfirm(p.id);
+                        }}
+                        onCancel={(e) => {
+                          e?.stopPropagation?.();
+                          handleReportCancel();
+                        }}
+                        okText="Yes"
+                        cancelText="No"
+                      >
+                        <button
+                          className="lx-act"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          ⋯
+                        </button>
+                      </Popconfirm>
                     </div>
                     <time className="lx-time">{fmtTime(p.createdAt)}</time>
                   </div>
@@ -288,10 +396,14 @@ export default function Discussion() {
         </div>
       </div>
 
-      {/* 悬浮发布按钮（保持不变） */}
       <button className="lx-fab" onClick={() => navigate("/post")} aria-label="发布动态">
         <svg className="lx-fab-icon" viewBox="0 0 24 24" width="18" height="18">
-          <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          <path
+            d="M12 5v14M5 12h14"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
         </svg>
         发布动态
       </button>

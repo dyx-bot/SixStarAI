@@ -120,7 +120,7 @@ export default function Discussion() {
       {/* 品牌区 */}
       <div className="lx-brand">
         <img src="/bjfu-logo.png" alt="北京林业大学" className="school-logo" />
-        <h1 className="lx-title">六星问知</h1>
+        <h1 className="lx-title">林小问</h1>
       </div>
 
       {/* 卡片容器（整体玻璃卡片） */}

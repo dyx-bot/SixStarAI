@@ -2,13 +2,22 @@ import React, { useState, useRef, useEffect } from "react";
 import { BASE } from "../lib/api";
 
 export default function Chat() {
-  const [list, setList] = useState([
-    {
-      role: "assistant",
-      avatar: "/bjfu-logo.png",
-      textResponse: "你好，我是六星问知 AI 助手～有什么想问的吗？",
-    },
-  ]);
+  // 新增一个函数：优先从 sessionStorage 读历史
+const loadMessages = () => {
+  const data = sessionStorage.getItem("chatMessages");
+  return data
+    ? JSON.parse(data)
+    : [
+        {
+          role: "assistant",
+          avatar: "/bjfu-logo.png",
+          textResponse: "你好，我是林小问 AI 助手～有什么想问的吗？",
+        },
+      ];
+};
+
+const [list, setList] = useState(loadMessages);
+
   const [msg, setMsg] = useState("");
   const [typing, setTyping] = useState(false);
   const fileRef = useRef(null);
@@ -19,6 +28,13 @@ export default function Chat() {
     if (el) el.scrollTop = el.scrollHeight;
   };
   useEffect(scrollToBottom, [list, typing]);
+
+
+  // 每次 list 改变时保存到 sessionStorage
+useEffect(() => {
+  sessionStorage.setItem("chatMessages", JSON.stringify(list));
+}, [list]);
+
 
   const send = async () => {
     const textResponse = msg.trim();
@@ -88,7 +104,7 @@ export default function Chat() {
               <div key={i} className={`chat-row ${m.role}`}>
                 {m.role === "assistant" && (
                   <div className="avatar">
-                    <img src={m.avatar} alt="六星问知" />
+                    <img src={m.avatar} alt="林小问" />
                   </div>
                 )}
                 <div className={`bubble ${m.role}`}>
@@ -101,7 +117,7 @@ export default function Chat() {
             {typing && (
               <div className="chat-row assistant">
                 <div className="avatar">
-                  <img src="/bjfu-logo.png" alt="六星问知" />
+                  <img src="/bjfu-logo.png" alt="林小问" />
                 </div>
                 <div className="bubble assistant typing">
                   <span></span>

@@ -10,7 +10,7 @@ export default function App() {
       <header className="m-header">
         <div className="m-header__brand">
           <img src="/bjfu-logo.png" alt="logo" />
-          <div className="m-header__title">六星问知</div>
+          <div className="m-header__title">林小问</div>
         </div>
       </header>
 

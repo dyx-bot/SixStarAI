@@ -4,9 +4,24 @@ import { getAuth } from "../auth/storage";
 import { BASE } from "../lib/api";
 import { ElMessage } from "element-plus";
 
+function makeAutoTitle(content, tag) {
+  const base = (content || "").trim().replace(/\s+/g, " ");
+  // 取内容前 20 个字符作标题；没有内容就用 “标签 · 无标题”
+  const t = base ? base.slice(0, 20) : "";
+  return t || `${tag || "动态"} · 无标题`;
+}
+
+function pickErrMsg(data) {
+  // 兼容常见的 Spring Validation 结构
+  if (data?.errors?.length) {
+    const e = data.errors[0];
+    return e.defaultMessage || e.message || JSON.stringify(e);
+  }
+  return data?.message || "";
+}
+
 export default function Post() {
   const [form, setForm] = useState({
-    title: "",
     content: "",
     tag: "",
     isHideCollege: false,
@@ -15,30 +30,37 @@ export default function Post() {
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 发布动态
   const handlePublish = async (e) => {
     e.preventDefault();
-    
-    // 验证表单
-    if (!form.title.trim() || !form.content.trim() || !form.tag.trim()) {
-      setFormError("所有内容都必须填写！");
+
+    if (!form.content.trim() || !form.tag.trim()) {
+      setFormError("内容和标签必须填写！");
       return;
     }
-    setFormError(""); // 清除错误信息
+    setFormError("");
 
-    const { id } = getAuth();
+    const auth = getAuth() || {};
+    const userId = auth.id;
+    if (!userId) {
+      alert("未登录或登录已过期");
+      return;
+    }
+
+    // ★ 自动生成标题，满足后端校验
+    const title = makeAutoTitle(form.content, form.tag);
+
     const postData = {
-      userId: id,
-      title: form.title,
+      userId,
+      title,                           // ★ 关键：提交 title
       content: form.content,
+      tag: form.tag,
       isHideCollege: form.isHideCollege,
       isHideGrade: form.isHideGrade,
-      tag: form.tag,
     };
 
     try {
       setIsSubmitting(true);
-      
+
       const res = await fetch(`${BASE}/api/posts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -46,35 +68,32 @@ export default function Post() {
       });
 
       let data = {};
-      const contentType = res.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        data = await res.json();
-      } else {
-        data = { success: true };
+      const ct = res.headers.get("content-type") || "";
+      if (ct.includes("application/json")) {
+        data = await res.json().catch(() => ({}));
       }
 
       if (res.ok) {
         ElMessage.success("发布成功！");
-        // 重置表单
-        setForm({ 
-          title: "", 
-          content: "", 
-          tag: "", 
-          isHideCollege: false, 
-          isHideGrade: false 
+        setForm({
+          content: "",
+          tag: "",
+          isHideCollege: false,
+          isHideGrade: false,
         });
-        
-        // 跳转到讨论页
         window.location.href = "/app/discussion";
       } else {
-        alert("发布失败：" + (data.message || "未知错误"));
+        console.error("POST /api/posts error:", data);
+        const msg = pickErrMsg(data) || "未知错误";
+        alert("发布失败：" + msg);
       }
     } catch (err) {
+      console.error(err);
       alert("请求失败：" + err.message);
     } finally {
       setIsSubmitting(false);
     }
-};
+  };
 
   return (
     <div className="lx-post-page">
@@ -89,19 +108,7 @@ export default function Post() {
         </div>
 
         <form onSubmit={handlePublish} className="lx-post-form">
-          {/* 标题输入 */}
-          <div className="lx-input-group">
-            <input
-              type="text"
-              placeholder="标题"
-              value={form.title}
-              onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))}
-              required
-              maxLength={50}
-            />
-          </div>
-
-          {/* 内容输入 */}
+          {/* 内容 */}
           <div className="lx-input-group">
             <textarea
               placeholder="内容"
@@ -114,63 +121,24 @@ export default function Post() {
             <div className="lx-char-count">{form.content.length}/140</div>
           </div>
 
-          {/* 标签选择 */}
+          {/* 标签 */}
           <div className="lx-tag-select">
             <div className="lx-tag-label">选择标签：</div>
             <div className="lx-tags">
-              <button 
-                type="button" 
-                className={`lx-tag ${form.tag === '学习/资料' ? 'selected' : ''}`}
-                onClick={() => setForm(f => ({ ...f, tag: '学习/资料' }))}
-              >
-                学习/资料
-              </button>
-              <button 
-                type="button" 
-                className={`lx-tag ${form.tag === '生活/吐槽' ? 'selected' : ''}`}
-                onClick={() => setForm(f => ({ ...f, tag: '生活/吐槽' }))}
-              >
-                生活/吐槽
-              </button>
-              <button 
-                type="button" 
-                className={`lx-tag ${form.tag === '表白/情感' ? 'selected' : ''}`}
-                onClick={() => setForm(f => ({ ...f, tag: '表白/情感' }))}
-              >
-                表白/情感
-              </button>
-              <button 
-                type="button" 
-                className={`lx-tag ${form.tag === '求助/攻略' ? 'selected' : ''}`}
-                onClick={() => setForm(f => ({ ...f, tag: '求助/攻略' }))}
-              >
-                求助/攻略
-              </button>
-              <button 
-                type="button" 
-                className={`lx-tag ${form.tag === '组队/组局' ? 'selected' : ''}`}
-                onClick={() => setForm(f => ({ ...f, tag: '组队/组局' }))}
-              >
-                组队/组局
-              </button>
-              <button 
-                type="button" 
-                className={`lx-tag ${form.tag === '闲置/交易' ? 'selected' : ''}`}
-                onClick={() => setForm(f => ({ ...f, tag: '闲置/交易' }))}
-              >
-                闲置/交易
-              </button>
-              <button 
-                type="button" 
-                className={`lx-tag ${form.tag === '寻物/招领' ? 'selected' : ''}`}
-                onClick={() => setForm(f => ({ ...f, tag: '寻物/招领' }))}
-              >
-                寻物/招领
-              </button>
+              {["学习/资料","生活/吐槽","表白/情感","求助/攻略","组队/组局","闲置/交易","寻物/招领"].map(t => (
+                <button
+                  key={t}
+                  type="button"
+                  className={`lx-tag ${form.tag === t ? "selected" : ""}`}
+                  onClick={() => setForm(f => ({ ...f, tag: t }))}
+                >
+                  {t}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* 隐藏选项 */}
+          {/* 隐私选项 */}
           <div className="lx-hide-options">
             <label className="lx-checkbox">
               <input
@@ -190,17 +158,15 @@ export default function Post() {
             </label>
           </div>
 
-          {/* 错误提示 */}
           {formError && <div className="lx-error-message">{formError}</div>}
 
-          {/* 发布按钮 */}
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="lx-btn"
             disabled={isSubmitting}
             style={{ width: "100%", marginTop: "16px" }}
           >
-            {isSubmitting ? '发布中...' : '发布'}
+            {isSubmitting ? "发布中..." : "发布"}
           </button>
         </form>
       </div>
@@ -208,174 +174,62 @@ export default function Post() {
       <style>{`
         .lx-post-page {
           min-height: 100vh;
-          background-color: #f0f4f1;
           display: flex;
           justify-content: center;
           align-items: center;
           padding: 20px;
+          background: radial-gradient(120% 90% at 50% -20%,
+            #fafffd 0%,
+            #f0fff8 35%,
+            #e9f7f1 65%,
+            #e3f3ed 100%);
         }
-        
         .lx-shell {
-          max-width: 600px;
+          max-width: 400px;
+          width: 100%;
           margin: 0 auto;
           padding: 16px;
-          border-radius: 12px;
-          background-color: #fff;
-          box-shadow: 0 2px 6px rgba(34, 160, 110, 0.2);
-          width: 100%;
-          max-width: 400px;
+          border-radius: 16px;
+          background: rgba(255,255,255,.7);
+          backdrop-filter: blur(12px);
+          box-shadow: 0 8px 24px rgba(34,160,110,.15);
         }
-
         .lx-header {
           display: flex;
           align-items: center;
           padding: 16px 0;
-          border-bottom: 1px solid #e1e9e4;
+          border-bottom: 1px solid rgba(225,233,228,.6);
         }
-        
-        .lx-back-btn {
-          background: none;
-          border: none;
-          cursor: pointer;
-          color: #184a38;
-          font-size: 24px;
-        }
-        
-        .lx-page-title {
-          flex: 1;
-          text-align: center;
-          font-size: 18px;
-          font-weight: 600;
-          color: #184a38;
-          margin: 0;
-        }
-        
-        .lx-post-form {
-          padding: 16px 0;
-        }
-        
-        .lx-input-group {
-          margin-bottom: 16px;
-        }
-        
-        .lx-input-group input,
+        .lx-back-btn { background:none; border:none; cursor:pointer; color:#184a38; font-size:24px; }
+        .lx-page-title { flex:1; text-align:center; font-size:18px; font-weight:600; color:#184a38; margin:0; }
+        .lx-post-form { padding: 16px 0; }
+        .lx-input-group { margin-bottom: 16px; }
         .lx-input-group textarea {
-          width: 100%;
-          padding: 12px;
-          border: 1px solid #e1e9e4;
-          border-radius: 12px;
-          font-size: 14px;
-          box-sizing: border-box;
-          background: #fff;
+          width:100%; padding:12px; border:1px solid #e1e9e4; border-radius:12px;
+          font-size:14px; box-sizing:border-box; background:#fff; resize:vertical; min-height:120px;
         }
-        
-        .lx-input-group textarea {
-          resize: vertical;
-          min-height: 120px;
-        }
-        
-        .lx-char-count {
-          text-align: right;
-          color: #6a8f82;
-          font-size: 12px;
-          margin-top: 4px;
-        }
-        
-        .lx-tag-select {
-          margin-bottom: 16px;
-        }
-        
-        .lx-tag-label {
-          font-size: 14px;
-          color: #184a38;
-          margin-bottom: 8px;
-          font-weight: 500;
-        }
-        
-        .lx-tags {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-        }
-        
+        .lx-char-count { text-align:right; color:#6a8f82; font-size:12px; margin-top:4px; }
+        .lx-tag-select { margin-bottom:16px; }
+        .lx-tag-label { font-size:14px; color:#184a38; margin-bottom:8px; font-weight:500; }
+        .lx-tags { display:flex; flex-wrap:wrap; gap:8px; }
         .lx-tag {
-          padding: 6px 12px;
-          border: 1px solid #e1e9e4;
-          border-radius: 16px;
-          background-color: #f8fffc;
-          color: #184a38;
-          font-size: 12px;
-          cursor: pointer;
-          transition: all 0.2s ease;
+          padding:6px 12px; border:1px solid #e1e9e4; border-radius:16px; background:#f8fffc;
+          color:#184a38; font-size:12px; cursor:pointer; transition:all .2s ease;
         }
-        
-        .lx-tag:hover {
-          background-color: #e6f5ee;
-        }
-        
-        .lx-tag.selected {
-          background-color: #184a38;
-          color: white;
-          border-color: #184a38;
-        }
-        
-        .lx-hide-options {
-          display: flex;
-          gap: 16px;
-          margin-bottom: 16px;
-          flex-wrap: wrap;
-        }
-        
-        .lx-checkbox {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          font-size: 14px;
-          color: #184a38;
-        }
-        
-        .lx-checkbox input[type="checkbox"] {
-          width: 16px;
-          height: 16px;
-          border: 1px solid #e1e9e4;
-          border-radius: 4px;
-          cursor: pointer;
-        }
-        
-        .lx-checkbox input[type="checkbox"]:checked {
-          background-color: #184a38;
-          border-color: #184a38;
-        }
-        
-        .lx-error-message {
-          color: #e74c3c;
-          font-size: 14px;
-          margin-bottom: 16px;
-          padding: 8px;
-          background-color: #ffeaea;
-          border-radius: 4px;
-        }
-        
+        .lx-tag:hover { background:#e6f5ee; }
+        .lx-tag.selected { background:#184a38; color:#fff; border-color:#184a38; }
+        .lx-hide-options { display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap; }
+        .lx-checkbox { display:flex; align-items:center; gap:4px; font-size:14px; color:#184a38; }
+        .lx-checkbox input[type="checkbox"] { width:16px; height:16px; border:1px solid #e1e9e4; border-radius:4px; cursor:pointer; }
+        .lx-checkbox input[type="checkbox"]:checked { background:#184a38; border-color:#184a38; }
+        .lx-error-message { color:#e74c3c; font-size:14px; margin-bottom:16px; padding:8px; background:#ffeaea; border-radius:4px; }
         .lx-btn {
-          padding: 12px 20px;
-          background: linear-gradient(180deg, #7ee2b6, #22a06e);
-          color: #fff;
-          border: none;
-          border-radius: 12px;
-          font-size: 16px;
-          font-weight: 500;
-          cursor: pointer;
-          box-shadow: 0 2px 6px rgba(34, 160, 110, 0.2);
+          padding:12px 20px; background:linear-gradient(180deg,#7ee2b6,#22a06e);
+          color:#fff; border:none; border-radius:12px; font-size:16px; font-weight:500;
+          cursor:pointer; box-shadow:0 2px 6px rgba(34,160,110,.2);
         }
-        
-        .lx-btn:hover:not(:disabled) {
-          opacity: 0.9;
-        }
-        
-        .lx-btn:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
+        .lx-btn:hover:not(:disabled){ opacity:.9; }
+        .lx-btn:disabled{ opacity:.6; cursor:not-allowed; }
       `}</style>
     </div>
   );

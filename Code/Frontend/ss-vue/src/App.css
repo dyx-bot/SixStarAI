@@ -13,7 +13,7 @@ body{
 }
 
 /* 外壳：手机居中画幅 */
-.m-app{height:100dvh;display:grid;grid-template-rows:auto 1fr auto;justify-content:center}
+.m-app{height:100vh;display:grid;grid-template-rows:auto 1fr auto;justify-content:center}
 
 .m-header,.m-main,.m-tabbar{width:min(420px,100vw)}
 
@@ -30,8 +30,9 @@ body{
 
 /* 主体（把滚动权交给内部页面） */
 .m-main{
- margin:8px auto 72px;padding:0 8px 8px;
+ margin:8px auto 25px;padding:0 8px 8px;
  min-height:0;               /* 允许压缩 */
+ height: auto;
  overflow:hidden;            /* 自己不滚 */
  display:grid;grid-template-rows:1fr;
  }
@@ -124,7 +125,7 @@ body{
 }
 
 /* ========= 全局固定浅绿背景板 ========= */
-/* 选择你页面最外层容器（示例用 .m-app；若你用 #root/.app-root，请把 .m-app 换成你的类名） */
+/* 选择你页面最外层容器 若你用 #root/.app-root，换成你的类名） */
 html, body, #root { height: 100%; }
 .m-app { min-height: 100%; position: relative; }
 
@@ -138,6 +139,7 @@ html, body, #root { height: 100%; }
   right: 425px;
   top: 12px;                             /* 背景板上边距，保持你的视觉 */
   bottom: calc(var(--tabbar-h) + var(--panel-gap) + var(--safe-bottom));
+
   border-radius: 28px;
   background:
     radial-gradient(120% 90% at 50% -20%,

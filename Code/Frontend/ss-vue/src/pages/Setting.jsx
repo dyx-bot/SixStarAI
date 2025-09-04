@@ -113,6 +113,31 @@ const handleUsernameSave = async() => {
   }
 };
 
+
+// 1. 定义 emoji 池和随机函数
+const P2_EMOJIS = [
+  "📚", "🖥️", "🍜", "📷", "🎨", "🌿", "🎧", "💼", "☕", "🍩",
+  "🎓", "🔬", "📱", "🧪", "⚽", "🧭", "🍎", "📖"
+];
+
+function hashStr(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = (h << 5) - h + s.charCodeAt(i);
+    h |= 0;
+  }
+  return Math.abs(h);
+}
+
+// 根据用户名/用户 id 生成稳定随机的 emoji
+function getEmojiAvatar(seed = "default") {
+  const idx = hashStr(seed) % P2_EMOJIS.length;
+  return P2_EMOJIS[idx];
+}
+
+
+
+
 // ...existing code...
 
   return (
@@ -121,13 +146,23 @@ const handleUsernameSave = async() => {
         <section className="setting-card">
           {/* 头像 */}
           <div className="setting-avatar-wrapper">
-            <img
-              src={avatarUrl}
-              alt="头像"
-              className={`setting-avatar ${uploading ? 'uploading' : ''}`}
-              onClick={updateAvatar}
-              style={{ cursor: isLoggedIn ? "pointer" : "default" }}
-            />
+            
+<span
+  className={`setting-avatar ${uploading ? "uploading" : ""}`}
+  onClick={updateAvatar}
+  style={{
+    cursor: isLoggedIn ? "pointer" : "default",
+    fontSize: "32px",      // emoji 大小
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }}
+>
+  {getEmojiAvatar(id || username || "default")}
+</span>
+
+
+
             {uploading && (
               <div className="upload-loading">上传中...</div>
             )}
