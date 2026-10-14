@@ -17,7 +17,7 @@ public class WebClientConfig {
     @Bean
     public WebClient anythingLlmWebClient() {
         return WebClient.builder()
-                .baseUrl("http://localhost:3001/api/v1/workspace/d96a4c24-f17a-424d-9cfc-32967c276866/chat")
+                .baseUrl("http://localhost:3001/api/v1/workspace/xxx/chat")
                 .defaultHeader("Authorization", "Bearer " + "P6MB6PW-4434BWN-HR4MAQT-GVTYANS")
                 .build();
     }
